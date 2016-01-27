@@ -1,0 +1,43 @@
+# Project specific
+*.zip
+/**/data/
+*.xls
+*.xlsx
+*.xlsm
+
+# Java files
+*.class
+.mtj.tmp/
+*.jar
+*.war
+*.ear
+/**/.settings/
+/**/.metadata/
+.recommenders/
+/**/bin/
+RemoteSystemsTempFiles/
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+.DS_Store
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
