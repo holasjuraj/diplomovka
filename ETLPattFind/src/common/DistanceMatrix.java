@@ -12,7 +12,6 @@ import java.util.Set;
 public class DistanceMatrix {
 	private Map<Pair<Integer>, FileComparison> matrix = new HashMap<>();
 	private Set<Integer> usedIds = new HashSet<>();
-	private int numFiles;
 	
 	/**
 	 * Adds a FileComparison to the matrix, increases counter of files if necessary.
@@ -25,12 +24,22 @@ public class DistanceMatrix {
 				fc.getFiles()[0].getId(),
 				fc.getFiles()[1].getId()};
 		for (int i = 0; i < 2; i++) {
-			if (usedIds.add(ids[i])) {
-				numFiles++;
-			}
+			usedIds.add(ids[i]); 
 		}
 		
 		return matrix.put(new Pair<Integer>(ids[0], ids[1]), fc);
+	}
+	
+	public void printIt() {
+    System.out.println("Files:");
+    for (Integer i : usedIds) {
+      System.out.println(i);
+    }
+    System.out.println("Pairs:");
+    for (Map.Entry<Pair<Integer>, FileComparison> item : matrix.entrySet()) {
+      System.out.println(item.getKey().hashCode());
+      System.out.println(item.getKey().elem1 + "," + item.getKey().elem2 + "->" + item.getValue());
+    }
 	}
 	
 	/**

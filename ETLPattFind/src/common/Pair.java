@@ -32,8 +32,8 @@ public class Pair<T> {
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
 		return obj instanceof Pair
-				&& elem1 == ((Pair<T>)obj).elem1
-				&& elem2 == ((Pair<T>)obj).elem2;
+				&& elem1.equals(((Pair<T>)obj).elem1)
+				&& elem2.equals(((Pair<T>)obj).elem2);
 	}
 	
 }

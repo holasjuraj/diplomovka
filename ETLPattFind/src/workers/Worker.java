@@ -8,7 +8,7 @@ import common.FileComparison;
 
 public class Worker extends Thread {  
   private final WorkerManager manager;
-  private double status;
+  private volatile double status;
   
   public Worker(WorkerManager manager) {
     this.manager = manager;

@@ -25,22 +25,17 @@ public class Main {
     HAC hac = new HAC(HAC.METHOD_UPGMA);
     
     List<File> files = EtlReader.readAndSeparate("data/set2/output2.xml");
-    // DEBUG
-    FileComparison fc = new FileComparison(files.get(128), files.get(129));
-    matrix.put(fc);
-    System.out.println(matrix.get(128, 129));
-    // /DEBUG
-//    manager.compareFiles(files, matrix, comparator);
-//    List<Dendrogram> clustering = hac.clusterize(files, matrix, 0.1);
-//    HAC.sortClusters(clustering);
-//    
-//    System.out.println("INFO: Results:");
-//    for(Dendrogram cluster : clustering){
-//      System.out.println(cluster.toStringNames());
-//    }
-//
-//    System.out.println("INFO: All finished, total time: "
-//        + ((new Date().getTime()) - start.getTime()) + "ms");
+    manager.compareFiles(files, matrix, comparator);
+    List<Dendrogram> clustering = hac.clusterize(files, matrix, 0.1);
+    HAC.sortClusters(clustering);
+    
+    System.out.println("INFO: Results:");
+    for(Dendrogram cluster : clustering){
+      System.out.println(cluster.toStringNames());
+    }
+
+    System.out.println("INFO: All finished, total time: "
+        + ((new Date().getTime()) - start.getTime()) + "ms");
   }
 
   /**
