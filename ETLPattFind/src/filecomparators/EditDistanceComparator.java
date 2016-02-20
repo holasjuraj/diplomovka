@@ -23,7 +23,7 @@ public class EditDistanceComparator extends FileComparator {
 	 * Initialize the comparator for given early stopping threshold (EST). If EST is out of normalized
 	 * range (0,1> , default value (0.1) is set and warning is printed.
 	 */
-	public EditDistanceComparator(int earlyStoppingThreshold) {
+	public EditDistanceComparator(double earlyStoppingThreshold) {
 		if (earlyStoppingThreshold <= 0 || earlyStoppingThreshold > 1) {
 			this.earlyStoppingThreshold = DEFAULT_ES_THRESHOLD;
 			System.out.println(
@@ -35,14 +35,14 @@ public class EditDistanceComparator extends FileComparator {
 		}
 	}
 
-	/**
-	 * Implementation of Eugene W. Myers`s algorithm from his article
-	 * "An O(ND) Difference Algorithm and Its Variations" with further improvements:
-	 * - MAX threshold is here computed from normalized early stopping threshold (EST)
-	 * - if algorithm passes EST, it estimates the result based on previous partial results
-	 * @return if result <= EST then it is exact distance of the files, otherwise it`s estimate of the
-	 * distance
-	 */
+  /**
+   * Implementation of Eugene W. Myers`s algorithm from his article
+   * "An O(ND) Difference Algorithm and Its Variations" with further improvements:
+   * <li>MAX threshold is here computed from normalized early stopping threshold (EST)</li>
+   * <li>if algorithm passes EST, it estimates the result based on previous partial results</li>
+   * @return if result <= EST then it is exact distance of the files, otherwise it`s estimate of the
+   *         distance
+   */
 	@Override
 	public double distance(File file1, File file2) {
 		int n = file1.size();
@@ -68,7 +68,7 @@ public class EditDistanceComparator extends FileComparator {
 				}
 				v[max + k] = x;
 				if (x >= n  &&  y >= m) {
-					return d;
+					return normalizeDist(d, n, m);
 				}
 			}
 		}
@@ -87,13 +87,13 @@ public class EditDistanceComparator extends FileComparator {
 		
 		if (score == 0) {
 			// Division by zero case
-			return n + m;
+			return normalizeDist(n + m, n, m);
 		} else {
 			// Distance cannot be more than n+m, hence the Math.min(...)
-			return Math.min(
-					n + m,
-					(int)Math.round( (double)max * diagonal / score ));
-		}
-	}
+			return normalizeDist(
+			    Math.min(n + m, (int)Math.round( (double)max * diagonal / score )),
+			    n, m);
+    }
+  }
 
 }

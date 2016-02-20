@@ -70,7 +70,7 @@ public class FileComparison {
 	/**
 	 * Sets the distance of files, and marks the comparison as exact.
 	 */
-	public void setDistExact(double distance) {
+	public void setDistanceExact(double distance) {
 		checkDistRange(distance);
 		lowBound  = distance;
 		highBound = distance;
@@ -80,7 +80,7 @@ public class FileComparison {
 	/**
 	 * Sets the bounds of estimated distance of the files, and marks the comparison as estimate.
 	 */
-	public void setDistApprox(double lowBound, double highBound) {
+	public void setDistanceApprox(double lowBound, double highBound) {
 		checkDistRange(lowBound);
 		checkDistRange(highBound);
 		this.lowBound  = lowBound;
@@ -93,16 +93,25 @@ public class FileComparison {
 	 */
 	private void checkDistRange(double distance) {
 		if (distance < 0 || distance > 1) {
-			System.out.println("WARN: FileComparison: Distance " + distance + " out of range <0, 1>.");
+			System.out.println("WARN: FileComparison.checkDistRange: Distance " + distance
+			    + " out of range <0, 1>.");
 		}
 	}
 
+	public String toString() {
+	  if (exact) {
+	    return "{" + f1.getId() + "," + f2.getId() + " = " + lowBound + "}";
+	  } else {
+      return "{" + f1.getId() + "," + f2.getId() + " = <" + lowBound + "," + highBound + ">}";
+	  }
+	}
+	
 	/**
 	 * Creates a FileComparison object for comparing the same file, with exact distance of 0.
 	 */
 	public static FileComparison getSelfComparison(File f){
 		FileComparison fc = new FileComparison(f, f);
-		fc.setDistExact(0.0);
+		fc.setDistanceExact(0.0);
 		return fc;
 	}
 	

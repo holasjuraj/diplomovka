@@ -20,7 +20,7 @@ public class DistanceMatrix {
 	 * @return FileComparison object that was assigned to compared pair of files, null if no such
 	 * existed.
 	 */
-	public FileComparison put(FileComparison fc) {
+	public synchronized FileComparison put(FileComparison fc) {
 		int[] ids = new int[]{
 				fc.getFiles()[0].getId(),
 				fc.getFiles()[1].getId()};
@@ -34,9 +34,10 @@ public class DistanceMatrix {
 	}
 	
 	/**
-	 * @return FileComparison object for files specified by their IDs.
+	 * Finds FileComparison object for files specified by their IDs. Function is symmetric, i.e.
+	 * get(i, j) == get(j, i).
 	 */
-	public FileComparison get(int id1, int id2) {
+	public synchronized FileComparison get(int id1, int id2) {
 		int idLow  = id1;
 		int idHigh = id2;
 		if (id1 > id2) {
@@ -47,9 +48,10 @@ public class DistanceMatrix {
 	}
 
 	/**
-	 * @return FileComparison object for files passed as references.
+	 * Finds FileComparison object for files passed as references. Function is symmetric, i.e.
+   * get(f1, f2) == get(f2, f1).
 	 */
-	public FileComparison get(File f1, File f2) {
+	public synchronized FileComparison get(File f1, File f2) {
 		return get(f1.getId(), f2.getId());
 	}
 	

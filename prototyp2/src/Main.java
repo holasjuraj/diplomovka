@@ -1,7 +1,7 @@
 import java.util.List;
 
 public class Main {
-	public static final String DATA_PATH = "data/set1";
+	public static final String DATA_PATH = "data/set2";
 
 	public static void main(String[] args) {
 		String[] clustMethods = {"UPGMA", "C-link", "S-link"};

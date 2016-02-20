@@ -67,7 +67,7 @@ public class HAC {
 			
 			// Stop condition - return if merge distance reaches given threshold
 			if (mergeDist > stopCondition) {
-				System.out.println("INFO: Clustering finished, total time: "
+				System.out.println("INFO: Clustering finished, time: "
 				    + ((new Date().getTime()) - start.getTime()) + "ms");
 				return clustering;
 			}
@@ -84,7 +84,7 @@ public class HAC {
 		}
 
 		// If all files merged within merging threshold
-		System.out.println("INFO: Clustering finished, total time: "
+		System.out.println("INFO: Clustering finished, time: "
 		    + ((new Date().getTime()) - start.getTime()) + "ms");
 		return clustering;
 	}

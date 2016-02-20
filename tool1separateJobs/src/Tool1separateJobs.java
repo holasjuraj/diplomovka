@@ -9,7 +9,7 @@ public class Tool1separateJobs {
 
 	public static void main(String[] args) {
 		System.out.println("Started");
-		String inPath = "data/output2.xml";
+		String inPath = "data/input/output2.xml";
 		String outPath = "data/output/";
 		String inFile = readFile(inPath);
 		int start = 0, end = 0;
