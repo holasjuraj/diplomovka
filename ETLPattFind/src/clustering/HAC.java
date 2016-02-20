@@ -14,9 +14,20 @@ public class HAC {
 	public static final int METHOD_UPGMA = 0;
 	public static final int METHOD_CLINK = 1;
 	public static final int METHOD_SLINK = 2;
+	
+	private final int joinMethod;
+	
+	public HAC() {
+		this(METHOD_UPGMA);
+	}
+	
+	public HAC(int joinMethod) {
+		this.joinMethod = joinMethod;
+	}
 
-	public static List<Dendrogram> clusterize(List<File> files, DistanceMatrix distMatrix, int method, double stopCond){
-		System.out.println("Clustering started");
+	public List<Dendrogram> clusterize(
+	    List<File> files, DistanceMatrix distMatrix, double stopCondition) {
+		System.out.println("INFO: Clustering started");
 		Date start = new Date();
 		
 		// Initialize all files as clusters
@@ -27,22 +38,21 @@ public class HAC {
 		
 		// Merge to one cluster
 		while (clustering.size() > 1) {
-			double minDist = Double.MAX_VALUE;		// Minimal distance between clusters A and B 
-			int minA = 0, minB = 1;					// Indexes of clusters A and B with minimal distance
+			double minDist = Double.MAX_VALUE;	// Minimal distance between clusters A and B		 
+			int minA = 0, minB = 1;		          // Indexes of clusters A and B with minimal distance
 			for (int ia = 0; ia < clustering.size(); ia++) {
 				for (int ib = ia + 1; ib < clustering.size(); ib++) {
 					double d = 1.0;
-					switch (method) {
+					switch (joinMethod) {
 						case METHOD_CLINK:
 							d = cLink(clustering.get(ia), clustering.get(ib), distMatrix);
 							break;
 						case METHOD_SLINK:
 							d = sLink(clustering.get(ia), clustering.get(ib), distMatrix);
 							break;
-						case METHOD_UPGMA:
-							// fall-through
+						case METHOD_UPGMA:	// fall-through
 						default:
-							d = UPGMA(clustering.get(ia), clustering.get(ib), distMatrix);
+							d = upgma(clustering.get(ia), clustering.get(ib), distMatrix);
 					}
 					if (d < minDist) {
 						// new best choice for merge
@@ -56,22 +66,26 @@ public class HAC {
 			double mergeDist = minDist;
 			
 			// Stop condition - return if merge distance reaches given threshold
-			if (mergeDist > stopCond) {
-				System.out.println("Clustering finished, total time: " + ((new Date().getTime()) - start.getTime()) + "ms");
+			if (mergeDist > stopCondition) {
+				System.out.println("INFO: Clustering finished, total time: "
+				    + ((new Date().getTime()) - start.getTime()) + "ms");
 				return clustering;
 			}
 			
 			// Merge two clusters
-			Dendrogram	a = clustering.get(minA),
-						b = clustering.get(minB);
+			Dendrogram a = clustering.get(minA);
+			Dendrogram b = clustering.get(minB);
 			Dendrogram newCluster = new Dendrogram(a, b, mergeDist);
 			clustering.remove(minB);
 			clustering.remove(minA);
 			clustering.add(newCluster);
+			
+			System.out.println("INFO: Clustering progress: " + (mergeDist / stopCondition * 100.0) + "%");
 		}
 
 		// If all files merged within merging threshold
-		System.out.println("Clustering finished, total time: " + ((new Date().getTime()) - start.getTime()) + "ms");
+		System.out.println("INFO: Clustering finished, total time: "
+		    + ((new Date().getTime()) - start.getTime()) + "ms");
 		return clustering;
 	}
 	
@@ -97,7 +111,7 @@ public class HAC {
 		});
 	}
 	
-	private static double UPGMA(Dendrogram a, Dendrogram b, DistanceMatrix dist){
+	private static double upgma(Dendrogram a, Dendrogram b, DistanceMatrix dist){
 		double dSum = 0;
 		for (File fa : a) {
 			for (File fb : b) {
@@ -136,4 +150,8 @@ public class HAC {
 		return dMin;
 	}
 
+	public int getJoinMethod() {
+		return joinMethod;
+	}
+	
 }

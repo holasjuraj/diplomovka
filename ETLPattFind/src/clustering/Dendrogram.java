@@ -14,8 +14,8 @@ public class Dendrogram implements Iterable<File> {
 	private Dendrogram left  = null;
 	private Dendrogram right = null;
 	private double distance  = 1.0;
-	/* TODO Change copying all elements from child nodes, modify size() and
-	 * iterator() to work with this.
+	/* TODO Change copying all elements from child nodes, modify size() and iterator() to work with
+	 * this.
 	 */
 	public List<File> files;
 	
@@ -31,8 +31,8 @@ public class Dendrogram implements Iterable<File> {
 	}
 	
 	/**
-	 * Initiates the Dendrogram node as inner node - with left and right
-	 * children, and connecting distance between them.
+	 * Initiates the Dendrogram node as inner node - with left and right children, and connecting
+	 * distance between them.
 	 */
 	public Dendrogram(Dendrogram left, Dendrogram right, double distance){
 		this.left  = left;
@@ -88,7 +88,6 @@ public class Dendrogram implements Iterable<File> {
 		return (files == null) ? 0 : files.size(); 
 	}
 
-
 	public Dendrogram getLeft() {
 		return left;
 	}
@@ -100,7 +99,6 @@ public class Dendrogram implements Iterable<File> {
 	public double getDistance() {
 		return distance;
 	}
-
 	
 	@Override
 	public Iterator<File> iterator() {

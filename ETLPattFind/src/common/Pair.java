@@ -1,8 +1,8 @@
 package common;
 
 /**
- * Encapsulation of pair of two elements (objects) of the same type. Class is
- * hash-table friendly thanks to implemented hashCode() and equals().
+ * Encapsulation of pair of two elements (objects) of the same type. Class is hash-table friendly
+ * thanks to implemented hashCode() and equals().
  * @author Juraj
  * @param <T> class of elements
  */

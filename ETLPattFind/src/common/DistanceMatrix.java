@@ -15,11 +15,10 @@ public class DistanceMatrix {
 	private int numFiles;
 	
 	/**
-	 * Adds a FileComparison to the matrix, increases counter of files if
-	 * necessary.
+	 * Adds a FileComparison to the matrix, increases counter of files if necessary.
 	 * @param fc comparison to be added.
-	 * @return FileComparison object that was assigned to compared pair of
-	 * files, null if no such existed.
+	 * @return FileComparison object that was assigned to compared pair of files, null if no such
+	 * existed.
 	 */
 	public FileComparison put(FileComparison fc) {
 		int[] ids = new int[]{
