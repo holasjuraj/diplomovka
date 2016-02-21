@@ -7,33 +7,64 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 import clustering.Dendrogram;
 import clustering.HAC;
+import filecomparators.CosineComparator;
 import filecomparators.EditDistanceComparator;
 import filecomparators.FileComparator;
+import filecomparators.JaccardComparator;
+import filecomparators.SorsenDiceComparator;
+import filecomparators.UkkonenComparator;
 import workers.WorkerManager;
 
 public class Main {
+  // Parameters
+  public static final int NUM_WORKERS = 3;
+  public static final double EDITDISTANCE_EST = 0.1;
+  public static final double HAC_THRESHOLD = 0.05;
+  
+  public static final int FILETYPE_SEQUENCEFILE = 0;
+  public static final int FILETYPE_QGRAMFILE = 1;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) {    
     System.out.println("INFO: Initialization.");
     Date start = new Date();
     DistanceMatrix matrix = new DistanceMatrix();
-    WorkerManager manager = new WorkerManager(3);
-    FileComparator comparator = new EditDistanceComparator(0.1);
+    WorkerManager manager = new WorkerManager(NUM_WORKERS);
+//    FileComparator comparator = new EditDistanceComparator(EDITDISTANCE_EST);
+    FileComparator comparator = new UkkonenComparator();
+//    FileComparator comparator = new CosineComparator();
+//    FileComparator comparator = new JaccardComparator();
+//    FileComparator comparator = new SorsenDiceComparator();
     HAC hac = new HAC(HAC.METHOD_UPGMA);
     
-    List<File> files = EtlReader.readAndSeparate("data/set2/output2.xml");
+    List<File> files = EtlReader.readAndSeparate(
+        "data/set3/output2.xml", comparator.getRequiredFileType());
     manager.compareFiles(files, matrix, comparator);
-    List<Dendrogram> clustering = hac.clusterize(files, matrix, 0.1);
-    HAC.sortClusters(clustering);
     
-    System.out.println("INFO: Results:");
-    for(Dendrogram cluster : clustering){
-      System.out.println(cluster.toStringNames());
+    Scanner in = new Scanner(System.in);
+    double thr;
+    while ((thr = in.nextDouble()) > 0) {
+      List<Dendrogram> clustering = hac.clusterize(files, matrix, thr);
+      HAC.sortClusters(clustering);
+      System.out.println("INFO: Results for threshold " + thr + ":");
+      for (int i = 0; i < clustering.size(); i++) {
+        Dendrogram cluster = clustering.get(i);
+        for (File file : cluster.files) {
+          System.out.println(file.getName() + "\t" + (i + 1));
+        }
+      }
     }
+    in.close();
 
+//    List<Dendrogram> clustering = hac.clusterize(files, matrix, HAC_THRESHOLD);
+//    HAC.sortClusters(clustering);
+//    System.out.println("INFO: Results for threshold " + HAC_THRESHOLD + ":");
+//    for (Dendrogram cluster : clustering) {
+//      System.out.println(cluster.toStringNames());
+//    }
     System.out.println("INFO: All finished, total time: "
         + ((new Date().getTime()) - start.getTime()) + "ms");
   }

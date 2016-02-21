@@ -16,6 +16,8 @@ public abstract class FileComparator {
 	 */
 	public abstract double distance(File file1, File file2);
 	
+	public abstract int getRequiredFileType();
+	
 	/**
 	 * Converts the distance of files to normalized form, i.e. between 0.0 and 1.0 (including). The
 	 * conversion preserves metric features including triangular inequality.

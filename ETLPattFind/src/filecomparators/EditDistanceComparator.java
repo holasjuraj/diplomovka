@@ -1,6 +1,8 @@
 package filecomparators;
 
 import common.File;
+import common.Main;
+import common.SequenceFile;
 
 /**
  * Implementation of Eugene W. Myers`s algorithm from his article
@@ -34,6 +36,11 @@ public class EditDistanceComparator extends FileComparator {
 			this.earlyStoppingThreshold = earlyStoppingThreshold;
 		}
 	}
+	
+	@Override
+	public int getRequiredFileType() {
+	  return Main.FILETYPE_SEQUENCEFILE;
+	}
 
   /**
    * Implementation of Eugene W. Myers`s algorithm from his article
@@ -42,11 +49,18 @@ public class EditDistanceComparator extends FileComparator {
    * <li>if algorithm passes EST, it estimates the result based on previous partial results</li>
    * @return if result <= EST then it is exact distance of the files, otherwise it`s estimate of the
    *         distance
+   * @throws IllegalArgumentException if input files are not type SequenceFile
    */
 	@Override
 	public double distance(File file1, File file2) {
-		int n = file1.size();
-  	int m = file2.size();
+	  if (!(file1 instanceof SequenceFile) || !(file2 instanceof SequenceFile)) {
+	    System.out.println("ERROR: EditDistanceComparator.distance: Incompatable file types.");
+	    throw new IllegalArgumentException();
+	  }
+    SequenceFile sFile1 = (SequenceFile) file1;
+    SequenceFile sFile2 = (SequenceFile) file2;
+		int n = sFile1.size();
+  	int m = sFile2.size();
   	int max = (int) Math.ceil((double)(n + m) * earlyStoppingThreshold);
 		double diagonal = Math.sqrt(n * n + m * m);
 		int[] v = new int[2 * max + 1];	// int[-max ... max]
@@ -62,7 +76,7 @@ public class EditDistanceComparator extends FileComparator {
 					x = v[max + k - 1] + 1;
 				}
 				y = x - k;
-				while (x < n  &&  y < m  &&  file1.get(x).equals(file2.get(y))) {
+				while (x < n  &&  y < m  &&  sFile1.get(x).equals(sFile2.get(y))) {
 					x++;
 					y++;
 				}

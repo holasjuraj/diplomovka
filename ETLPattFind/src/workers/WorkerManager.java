@@ -24,7 +24,8 @@ public class WorkerManager {
     }
   }
   
-  public void compareFiles(List<File> files, DistanceMatrix distMatrix, FileComparator comparator) {
+  public void compareFiles(
+      List<File> files, DistanceMatrix distMatrix, FileComparator comparator) {
     this.comparator = comparator;
     this.distMatrix = distMatrix;
     prepareTaskPool(files);

@@ -31,7 +31,7 @@ public class EtlReader {
    * @param path path to input ETL file
    * @return list of File objects
    */
-  public static List<File> readAndSeparate(String path) {
+  public static List<File> readAndSeparate(String path, int fileType) {
     System.out.println("INFO: Input file reading started.");
     int start = 0;
     int end = 0;
@@ -59,14 +59,34 @@ public class EtlReader {
       } else {
         jobName = jobXml.substring(nameStart, nameEnd);
       }
-      
-      File f = new File(result.size(), jobName);  // result.size is next ID
-      f.setContent(tokenize(jobXml));
+
+      File f;
+      int newId = result.size();    // result.size is next ID
+      switch (fileType) {
+        case Main.FILETYPE_QGRAMFILE:
+          f = processQGramFile(newId, jobName, jobXml);
+          break;
+        case Main.FILETYPE_SEQUENCEFILE: // fall-through
+        default:
+          f = processSequenceFile(newId, jobName, jobXml);
+      }
       result.add(f);
     }
     
-    System.out.println("INFO: Input file reading finished.");
+    System.out.println("INFO: Input file reading finished (" + result.size() + " ETL jobs).");
     return result;
+  }
+  
+  private static File processSequenceFile(int id, String jobName, String jobXml) {
+    SequenceFile f = new SequenceFile(id, jobName);
+    f.setContent(tokenize(jobXml));
+    return f;
+  }
+  
+  private static File processQGramFile(int id, String jobName, String jobXml) {
+    QGramFile f = new QGramFile(id, jobName);
+    f.createProfile(tokenize(jobXml), 2); // TODO extract fixed parameter q!
+    return f;
   }
 
   
