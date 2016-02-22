@@ -14,11 +14,12 @@ public class DistanceMatrix {
 	private Set<Integer> usedIds = new HashSet<>();
 	
 	/**
-	 * Adds a FileComparison to the matrix, increases counter of files if necessary.
-	 * @param fc comparison to be added.
-	 * @return FileComparison object that was assigned to compared pair of files, null if no such
-	 * existed.
-	 */
+   * Adds a {@link FileComparison} to the matrix, increases counter of files if necessary. Function
+   * is synchronized - safe reading from multiple threads.
+   * @param fc comparison to be added.
+   * @return {@link FileComparison} object that was assigned to compared pair of files, null if no
+   *         such existed.
+   */
 	public synchronized FileComparison put(FileComparison fc) {
 		int[] ids = new int[]{
 				fc.getFiles()[0].getId(),
@@ -30,22 +31,24 @@ public class DistanceMatrix {
 		return matrix.put(new Pair<Integer>(ids[0], ids[1]), fc);
 	}
 	
-	public void printIt() {
-    System.out.println("Files:");
+	public String toString() {
+	  StringBuilder sb = new StringBuilder("Files: ");
     for (Integer i : usedIds) {
-      System.out.println(i);
+      sb.append(i);
+      sb.append(", ");
     }
-    System.out.println("Pairs:");
+    sb.append("\nPairs:");
     for (Map.Entry<Pair<Integer>, FileComparison> item : matrix.entrySet()) {
-      System.out.println(item.getKey().hashCode());
-      System.out.println(item.getKey().elem1 + "," + item.getKey().elem2 + "->" + item.getValue());
+      sb.append(item.getValue());
+      sb.append("\n");
     }
+    return sb.toString();
 	}
 	
 	/**
-	 * Finds FileComparison object for files specified by their IDs. Function is symmetric, i.e.
-	 * get(i, j) == get(j, i).
-	 */
+   * Finds {@link FileComparison} object for files specified by their IDs. Function is symmetric,
+   * i.e. get(i, j) == get(j, i), and synchronized - safe reading from multiple threads.
+   */
 	public synchronized FileComparison get(int id1, int id2) {
 		int idLow  = id1;
 		int idHigh = id2;
@@ -57,9 +60,9 @@ public class DistanceMatrix {
 	}
 
 	/**
-	 * Finds FileComparison object for files passed as references. Function is symmetric, i.e.
-   * get(f1, f2) == get(f2, f1).
-	 */
+   * Finds {@link FileComparison} object for files passed as references. Function is symmetric, i.e.
+   * get(f1, f2) == get(f2, f1), and synchronized - safe reading from multiple threads.
+   */
 	public synchronized FileComparison get(File f1, File f2) {
 		return get(f1.getId(), f2.getId());
 	}

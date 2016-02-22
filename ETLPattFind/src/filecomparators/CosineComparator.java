@@ -6,8 +6,18 @@ import common.File;
 import common.Main;
 import common.QGramFile;
 
+/**
+ * Implementation of cosine distance of q-gram vectors of files.
+ * @author Juraj
+ */
 public class CosineComparator extends FileComparator {
 
+  /**
+   * Computes cosine distance of q-gram vectors of files: d = 1 - (u.v) / (|u|.|v|)
+   * @return distance normalized to interval (0.0, 1.0)
+   * @throws {@link IllegalArgumentException} if input files are not type {@link QGramFile}
+   * @see filecomparators.FileComparator#distance(common.File, common.File)
+   */
   @Override
   public double distance(File file1, File file2) {
     if (!(file1 instanceof QGramFile) || !(file2 instanceof QGramFile)) {
@@ -35,6 +45,10 @@ public class CosineComparator extends FileComparator {
     return 1.0 - (double)dotProd / (qFile1.getVectorLength() * qFile2.getVectorLength());
   }
 
+  /**
+   * @return ID of {@link QGramFile} type
+   * @see filecomparators.FileComparator#getRequiredFileType()
+   */
   @Override
   public int getRequiredFileType() {
     return Main.FILETYPE_QGRAMFILE;

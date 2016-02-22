@@ -1,9 +1,9 @@
 package common;
 
 /**
- * Container for holding distance of two files, either exact or estimated (low and high bound).
- * Distances have to be normalized, e.g. between 0.0 and 1.0 (including). Files are stored in a way,
- * that file1 is the file with lower ID, file2 has higher ID.
+ * Container for holding distance of two {@link File}s, either exact or estimated (low and high
+ * bound). Distances have to be normalized, e.g. between 0.0 and 1.0 (including). Files are stored
+ * in a way, that file1 is the file with lower ID, file2 has higher ID.
  * @author Juraj
  */
 public class FileComparison {
@@ -14,11 +14,11 @@ public class FileComparison {
 	private boolean exact = false;
 	
 	/**
-	 * Initialize the comparison for two given files. It is initialized as estimate with
-	 * lowBound == 0 and highBound == 1. Files are stored in a way, that file1 is the file with lower
-	 * ID, file2 has higher ID.
-	 * @throws NullPointerException if one or both of the files are null.
-	 */
+   * Initialize the comparison for two given files. It is initialized as estimate with lowBound == 0
+   * and highBound == 1. Files are stored in a way, that file1 is the file with lower ID, file2 has
+   * higher ID.
+   * @throws {@link NullPointerException} if one or both of the files are null.
+   */
 	public FileComparison(File f1, File f2) {
 		if (f1 == null || f2 == null) {
 			System.out.println(
@@ -36,7 +36,7 @@ public class FileComparison {
 	}
 
 	/**
-	 * @return two-field array of compared files
+	 * @return two-field array of compared {@link File}s
 	 */
 	public File[] getFiles() {
 		return new File[] {f1, f2};
@@ -68,7 +68,7 @@ public class FileComparison {
 	}
 
 	/**
-	 * Sets the distance of files, and marks the comparison as exact.
+	 * Sets the distance of {@link File}s, and marks the comparison as exact.
 	 */
 	public void setDistanceExact(double distance) {
 		checkDistRange(distance);
@@ -78,8 +78,9 @@ public class FileComparison {
 	}
 
 	/**
-	 * Sets the bounds of estimated distance of the files, and marks the comparison as estimate.
-	 */
+   * Sets the bounds of estimated distance of the {@link File}s, and marks the comparison as
+   * estimate.
+   */
 	public void setDistanceApprox(double lowBound, double highBound) {
 		checkDistRange(lowBound);
 		checkDistRange(highBound);
@@ -107,8 +108,9 @@ public class FileComparison {
 	}
 	
 	/**
-	 * Creates a FileComparison object for comparing the same file, with exact distance of 0.
-	 */
+   * Creates a {@link FileComparison} object for comparing the same {@link File}, with exact
+   * distance of 0.
+   */
 	public static FileComparison getSelfComparison(File f){
 		FileComparison fc = new FileComparison(f, f);
 		fc.setDistanceExact(0.0);

@@ -10,6 +10,11 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 
+/**
+ * Hierarchical Agglomerative Clustering - tools for splitting list of files into clusters of
+ * similar files.
+ * @author Juraj
+ */
 public class HAC {
 	public static final int METHOD_UPGMA = 0;
 	public static final int METHOD_CLINK = 1;
@@ -17,14 +22,29 @@ public class HAC {
 	
 	private final int joinMethod;
 	
+	/**
+	 * Initialize {@link HAC} with default joining method - UPGMA.
+	 */
 	public HAC() {
 		this(METHOD_UPGMA);
 	}
 	
+	/**
+	 * Initialize {@link HAC} with selected joining method.
+	 */
 	public HAC(int joinMethod) {
 		this.joinMethod = joinMethod;
 	}
 
+	/**
+	 * Given files list and corresponding distance matrix, split all files into clusters of similar
+	 * files. Function iteratively merges two most-similar clusters, until the merging distance
+	 * exceeds given threshold (stopCondition).
+	 * @param files list of files to be split into clusters
+	 * @param distMatrix distance matrix - must contain comparisons for all pairs of files
+	 * @param stopCondition maximal distance of two clusters that can be merged into one
+	 * @return list of {@link Dendrogram}s representing individual clusters
+	 */
 	public List<Dendrogram> clusterize(
 	    List<File> files, DistanceMatrix distMatrix, double stopCondition) {
 		System.out.println("INFO: Clustering started");
@@ -87,6 +107,14 @@ public class HAC {
 		return clustering;
 	}
 	
+	/**
+	 * Sorts the clustering - useful for comparing and outputting. Sorting is two-leveled:
+	 * <li>each cluster is sorted based on file IDs (low to high)</li>
+	 * <li>clusters are sorted based their size (high to low), if two clusters are the same size then
+	 * based on the ID of their first file (low to high)</li>
+	 * Function modifies input structure.
+	 * @param clustering list of {@link Dendrogram}s representing individual clusters
+	 */
 	public static void sortClusters(List<Dendrogram> clustering) {
 		for(Dendrogram cluster : clustering){
 			Collections.sort(cluster.files, new Comparator<File>() {
@@ -109,6 +137,15 @@ public class HAC {
 		});
 	}
 	
+	/**
+	 * Function for comparing distance of two clusters using UPGMA method (Unweighted Pair Group
+	 * Method with Arithmetic Mean) - arithmetic average of distances of all pairs from cluster A and
+	 * cluster B.
+	 * @param a cluster A
+	 * @param b cluster B
+	 * @param dist distance matrix - must contain comparisons for all pairs of files
+	 * @return UPGMA distance of clusters
+	 */
 	private static double upgma(Dendrogram a, Dendrogram b, DistanceMatrix dist){
 		double dSum = 0;
 		for (File fa : a) {
@@ -122,6 +159,14 @@ public class HAC {
 		return dSum / (double)(a.size() * b.size());
 	}
 	
+	/**
+	 * Function for comparing distance of two clusters using C-Link method (Complete Linkage) -
+	 * maximal distance of two points from cluster A and cluster B.
+   * @param a cluster A
+   * @param b cluster B
+   * @param dist distance matrix - must contain comparisons for all pairs of files
+   * @return C-Link distance of clusters
+	 */
 	private static double cLink(Dendrogram a, Dendrogram b, DistanceMatrix dist){
 		double dMax = 0;
 		for (File fa : a) {
@@ -135,6 +180,14 @@ public class HAC {
 		return dMax;
 	}
 	
+	/**
+   * Function for comparing distance of two clusters using S-Link method (Single Linkage) -
+   * minimal distance of two points from cluster A and cluster B.
+   * @param a cluster A
+   * @param b cluster B
+   * @param dist distance matrix - must contain comparisons for all pairs of files
+   * @return S-Link distance of clusters
+	 */
 	private static double sLink(Dendrogram a, Dendrogram b, DistanceMatrix dist){
 		double dMin = Double.MAX_VALUE;
 		for (File fa : a) {

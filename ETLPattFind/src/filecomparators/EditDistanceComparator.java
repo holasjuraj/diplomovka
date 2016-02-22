@@ -36,11 +36,6 @@ public class EditDistanceComparator extends FileComparator {
 			this.earlyStoppingThreshold = earlyStoppingThreshold;
 		}
 	}
-	
-	@Override
-	public int getRequiredFileType() {
-	  return Main.FILETYPE_SEQUENCEFILE;
-	}
 
   /**
    * Implementation of Eugene W. Myers`s algorithm from his article
@@ -48,9 +43,10 @@ public class EditDistanceComparator extends FileComparator {
    * <li>MAX threshold is here computed from normalized early stopping threshold (EST)</li>
    * <li>if algorithm passes EST, it estimates the result based on previous partial results</li>
    * @return if result <= EST then it is exact distance of the files, otherwise it`s estimate of the
-   *         distance
-   * @throws IllegalArgumentException if input files are not type SequenceFile
-   */
+   *         distance. Result distance is normalized to interval (0.0, 1.0).
+   * @throws {@link IllegalArgumentException} if input files are not type {@link SequenceFile}
+	 * @see filecomparators.FileComparator#distance(common.File, common.File)
+	 */
 	@Override
 	public double distance(File file1, File file2) {
 	  if (!(file1 instanceof SequenceFile) || !(file2 instanceof SequenceFile)) {
@@ -108,6 +104,15 @@ public class EditDistanceComparator extends FileComparator {
 			    Math.min(n + m, (int)Math.round( (double)max * diagonal / score )),
 			    n, m);
     }
+  }
+
+  /**
+   * @return ID of {@link SequenceFile} type
+   * @see filecomparators.FileComparator#getRequiredFileType()
+   */
+  @Override
+  public int getRequiredFileType() {
+    return Main.FILETYPE_SEQUENCEFILE;
   }
 
 }

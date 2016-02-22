@@ -20,7 +20,7 @@ public class Dendrogram implements Iterable<File> {
 	public List<File> files;
 	
 	/**
-	 * Initiates the Dendrogram node as leaf - with reference to a file.
+	 * Initiates the {@link Dendrogram} node as leaf - with reference to a file.
 	 */
 	public Dendrogram(File file){
 		if (file == null) {
@@ -30,10 +30,10 @@ public class Dendrogram implements Iterable<File> {
 		files.add(file);
 	}
 	
-	/**
-	 * Initiates the Dendrogram node as inner node - with left and right children, and connecting
-	 * distance between them.
-	 */
+  /**
+   * Initiates the {@link Dendrogram} node as inner node - with left and right children, and
+   * connecting distance between them.
+   */
 	public Dendrogram(Dendrogram left, Dendrogram right, double distance){
 		this.left  = left;
 		this.right = right;
@@ -43,10 +43,9 @@ public class Dendrogram implements Iterable<File> {
 		files.addAll(right.files);
 	}
 	
-	/**
-	 * Determines if node is a leaf node, and therefore referring to single
-	 * file.
-	 */
+  /**
+   * Determines if node is a leaf node, and therefore referring to single file.
+   */
 	public boolean isLeaf(){
 		return left == null && right == null;
 	}

@@ -3,19 +3,22 @@ package filecomparators;
 import common.File;
 
 /**
- * Interface that ensures implementation of distance() method for comparing two files.
+ * Interface that ensures implementation of distance() method for comparing two {@link File}s.
  * @author Juraj
  */
 public abstract class FileComparator {
 
 	/**
-	 * Compares two files and returns normalized distance between them.
+	 * Compares two {@link File}s and returns normalized distance between them.
 	 * @param f1 first file
 	 * @param f2 second file
 	 * @return normalized distance, i.e. between 0.0 and 1.0 (including)
 	 */
 	public abstract double distance(File file1, File file2);
 	
+	/**
+	 * @return ID of subclass of {@link File}s, that is required by the comparator
+	 */
 	public abstract int getRequiredFileType();
 	
 	/**

@@ -6,8 +6,18 @@ import common.File;
 import common.Main;
 import common.QGramFile;
 
+/**
+ * Implementation of Ukkonen distance of files - L1 distance of q-gram vectors.
+ * @author Juraj
+ */
 public class UkkonenComparator extends FileComparator {
 
+  /**
+   * Computes normalized Ukkonen distance of files - L1 distance of q-gram vectors.
+   * @return distance normalized to interval (0.0, 1.0)
+   * @throws {@link IllegalArgumentException} if input files are not type {@link QGramFile}
+   * @see filecomparators.FileComparator#distance(common.File, common.File)
+   */
   @Override
   public double distance(File file1, File file2) {
     if (!(file1 instanceof QGramFile) || !(file2 instanceof QGramFile)) {
@@ -33,6 +43,10 @@ public class UkkonenComparator extends FileComparator {
     return normalizeDist(sum, qFile1.getSetSize(), qFile2.getSetSize());
   }
 
+  /**
+   * @return ID of {@link QGramFile} type
+   * @see filecomparators.FileComparator#getRequiredFileType()
+   */
   @Override
   public int getRequiredFileType() {
     return Main.FILETYPE_QGRAMFILE;

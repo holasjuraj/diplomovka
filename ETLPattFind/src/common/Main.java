@@ -72,7 +72,7 @@ public class Main {
   /**
    * Redirects standard output (System.out) to specified file.
    * @param path path to file
-   * @return PrintStream to redirected output (needed to be flushed and closed on exit)
+   * @return {@link PrintStream} to redirected output (needed to be flushed and closed on exit)
    */
   public static PrintStream redirectOutput(String path) {
     PrintStream outPs = null;
@@ -87,7 +87,7 @@ public class Main {
 
   /**
    * Resets standard output (System.out) to default value.
-   * @param outPs PrintStream that was used up to now - it will be flushed and closed
+   * @param outPs {@link PrintStream} that was used up to now - it will be flushed and closed
    */
   public static void resetOutput(PrintStream outPs) {
     outPs.flush();

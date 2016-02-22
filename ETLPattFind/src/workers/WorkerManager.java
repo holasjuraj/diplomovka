@@ -10,6 +10,11 @@ import common.FileComparison;
 import filecomparators.FileComparator;
 import workers.Worker.WorkerTask;
 
+/**
+ * Class for managing a set of {@link Worker}s for comparing files. Manager creates {@link Worker}
+ * threads, prepares and delegates tasks to them.
+ * @author Juraj
+ */
 public class WorkerManager {
   private DistanceMatrix distMatrix;
   private FileComparator comparator;
@@ -17,6 +22,10 @@ public class WorkerManager {
   private final List<Worker> workerPool;
   private int assignedTasks; 
   
+  /**
+   * Creates new manager with a given number of {@link Worker}s. Workers are created, but not yet
+   * launched.
+   */
   public WorkerManager(int numWorkers) {
     workerPool = new ArrayList<>(numWorkers);
     for (int i = 0; i < numWorkers; i++) {
@@ -24,6 +33,15 @@ public class WorkerManager {
     }
   }
   
+  /**
+   * Compares all files by given comparator, and stores results into distMatrix. This method
+   * prepares all tasks, launches all workers and wait for them to end.
+   * @param files list of files to be compared
+   * @param distMatrix distance matrix that the results will be stored in. Only adding is performed,
+   *          therefore matrix can be already partially filled (current values will be replaced).
+   * @param comparator comparator that will be used for comparing files. Make sure that files in
+   *          list are of the same type as comparator`s required file type.
+   */
   public void compareFiles(
       List<File> files, DistanceMatrix distMatrix, FileComparator comparator) {
     this.comparator = comparator;
@@ -46,7 +64,10 @@ public class WorkerManager {
         + ((new Date().getTime()) - start.getTime()) + "ms");
   }
 
-  public synchronized WorkerTask serveTask() {
+  /**
+   * Provides next task from the task pool, removing it from the pool. Also prints progress.
+   */
+  synchronized WorkerTask serveTask() {
     if (assignedTasks < taskPool.size()) {
       System.out.println("INFO: Comparing progress: "
           + ((double)assignedTasks / (double)taskPool.size() * 100) + "%");
@@ -56,14 +77,18 @@ public class WorkerManager {
     }
   }
   
-  public DistanceMatrix getDistanceMatrix() {
+  DistanceMatrix getDistanceMatrix() {
     return distMatrix;
   }
   
-  public FileComparator getComparator() {
+  FileComparator getComparator() {
     return comparator;
   }
   
+  /**
+   * Creates all tasks for {@link Worker}s and stores it into task pool.
+   * @param files list of {@link File}s to be compared
+   */
   private synchronized void prepareTaskPool(List<File> files) {
     System.out.println("INFO: Preparing camparison tasks.");
     assignedTasks = 0;

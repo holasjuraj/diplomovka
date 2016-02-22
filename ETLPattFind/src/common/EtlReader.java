@@ -18,18 +18,19 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Pack of tools for preprocessing the ETL files:
- * <li>tokenize(xml) splits XML into tokens</li>
- * <li>readAndSeparate(path) reads the input ETL, splits the jobs, and tokenzie each of them</li>
- * <li>readFile(path) fast reading of file from disk</li>
+ * <li>readAndSeparate(path) - reads the input ETL, splits the jobs, and converts them into
+ * {@link File} objects of specified type.</li>
+ * <li>tokenize(xml) - splits XML into tokens</li>
+ * <li>readFile(path) - fast reading of file from disk</li>
  * @author Juraj
  */
 public class EtlReader {
 
   /**
-   * Reads input ETL file from disk, separates ETL jobs, and converts each of them into File object
-   * (by tokenizing it). 
+   * Reads input ETL file from disk, separates ETL jobs, and converts each of them into {@link File}
+   * object of given type.
    * @param path path to input ETL file
-   * @return list of File objects
+   * @return list of {@link File} objects
    */
   public static List<File> readAndSeparate(String path, int fileType) {
     System.out.println("INFO: Input file reading started.");
@@ -77,13 +78,25 @@ public class EtlReader {
     return result;
   }
   
-  private static File processSequenceFile(int id, String jobName, String jobXml) {
+  /**
+   * Creates a {@link SequenceFile} object from raw text content of the file.
+   * @param id ID to be given to the {@link File} object
+   * @param jobName file (ETL job) name
+   * @param jobXml file content (ETL job body)
+   */
+  private static SequenceFile processSequenceFile(int id, String jobName, String jobXml) {
     SequenceFile f = new SequenceFile(id, jobName);
     f.setContent(tokenize(jobXml));
     return f;
   }
   
-  private static File processQGramFile(int id, String jobName, String jobXml) {
+  /**
+   * Creates a {@link QGramFile} object from raw text content of the file.
+   * @param id ID to be given to the {@link File} object
+   * @param jobName file (ETL job) name
+   * @param jobXml file content (ETL job body)
+   */
+  private static QGramFile processQGramFile(int id, String jobName, String jobXml) {
     QGramFile f = new QGramFile(id, jobName);
     f.createProfile(tokenize(jobXml), 2); // TODO extract fixed parameter q!
     return f;
@@ -147,7 +160,7 @@ public class EtlReader {
 
 
   /**
-   * Reads a file into a string using BufferedInputStream (tested to be the fastest option).
+   * Reads a file into a string using {@link BufferedInputStream} (tested to be the fastest option).
    */
   public static String readFile(String path) {
     final int SIZE = 8192; // 8k
