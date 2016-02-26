@@ -1,11 +1,14 @@
 package common;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -29,7 +32,8 @@ public class EtlReader {
   /**
    * Reads input ETL file from disk, separates ETL jobs, and converts each of them into {@link File}
    * object of given type.
-   * @param path path to input ETL file
+   * @param path path to input ETL file (*.xml), or path to ZIP archive containing the input *.xml
+   *          file
    * @return list of {@link File} objects
    */
   public static List<File> readAndSeparate(String path, int fileType) {
@@ -38,10 +42,23 @@ public class EtlReader {
     int end = 0;
     List<File> result = new ArrayList<>();
     
-    String inFile = readFile(path);
+    // Read input ETL file (directly or from zip)
+    String inputExt = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
+    String inFile;
+    if (inputExt.equals("xml")) {
+      inFile = readFile(path);
+    } else if (inputExt.equals("zip")) {
+      inFile = readEtlFromZip(path);
+    } else {
+      System.out.println("ERROR: EtlReader.readAndSeparate: Unsupported file type.");
+      return null;
+    }
+    
+    // Normalize input file
     inFile = inFile.replaceAll(">[\\n\\s]*<", "><");    // Remove whitespace between tags
     String inFLower = inFile.toLowerCase();
     
+    // Separate jobs
     while ((start = inFLower.indexOf("<job", end)) != -1) {
       end = inFLower.indexOf("</job>", start) + "</job>".length();
       if (end < start) {
@@ -61,6 +78,7 @@ public class EtlReader {
         jobName = jobXml.substring(nameStart, nameEnd);
       }
 
+      // Create File from String
       File f;
       int newId = result.size();    // result.size is next ID
       switch (fileType) {
@@ -159,17 +177,17 @@ public class EtlReader {
   }
 
 
+  private static final int BUFFER_SIZE = 8192; // 8k
   /**
    * Reads a file into a string using {@link BufferedInputStream} (tested to be the fastest option).
    */
   public static String readFile(String path) {
-    final int SIZE = 8192; // 8k
     try {
       BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
       StringBuilder sb = new StringBuilder();
-      byte[] bArr = new byte[SIZE];
+      byte[] bArr = new byte[BUFFER_SIZE];
       int nRead = 0;
-      while ((nRead = bis.read(bArr, 0, SIZE)) != -1) {
+      while ((nRead = bis.read(bArr, 0, BUFFER_SIZE)) != -1) {
         for (int i = 0; i < nRead; i++) {
           sb.append((char) bArr[i]);
         }
@@ -178,6 +196,52 @@ public class EtlReader {
       return sb.toString();
     } catch (IOException e) {
       System.out.println("ERROR: EtlReader.readFile: Error reading file " + path + ".");
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Reads ETL file from ZIP archive into a String. Method looks through archive`s root directory,
+   * takes any *.xml file (file extension is case insensitive) and reads it.
+   * @param zipPath path to ZIP archive
+   * @return content of ETL file from archive, or null if archive/XML file was not found
+   */
+  public static String readEtlFromZip(String zipPath) {
+    try {
+      ZipInputStream zis = new ZipInputStream(new FileInputStream(zipPath));
+      
+      // Find the ETL file.
+      ZipEntry zFile;
+      while ((zFile = zis.getNextEntry()) != null) {
+        String name = zFile.getName();
+        String ext = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+        if (ext.equals("xml")) {
+          break;  // Found the ETL file.
+        }
+      }
+
+      // If no *.xml file was found.
+      if (zFile == null) {
+        System.out.println("ERROR: EtlReader.readEtlFromZip: Can`t find *.xml file in archive.");
+        zis.close();
+        return null;
+      }
+      
+      // Read the ETL file into String.
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      byte[] bytes = new byte[BUFFER_SIZE];
+      int readLength;
+      while ((readLength = zis.read(bytes)) > -1) {
+        baos.write(bytes, 0, readLength);
+      }
+      String result = baos.toString("UTF-8");
+      zis.close();
+      baos.close();
+      
+      return result;
+    } catch (IOException e) {
+      System.out.println("ERROR: EtlReader.readEtlFromZip: Error reading file " + zipPath + ".");
       e.printStackTrace();
     }
     return null;

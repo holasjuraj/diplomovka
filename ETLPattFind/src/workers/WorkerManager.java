@@ -69,8 +69,8 @@ public class WorkerManager {
    */
   synchronized WorkerTask serveTask() {
     if (assignedTasks < taskPool.size()) {
-      System.out.println("INFO: Comparing progress: "
-          + ((double)assignedTasks / (double)taskPool.size() * 100) + "%");
+      System.out.printf("INFO: Comparing progress: %.2f%%\n",
+          ((double)assignedTasks / (double)taskPool.size() * 100));
       return taskPool.get(assignedTasks++);
     } else {
       return null;

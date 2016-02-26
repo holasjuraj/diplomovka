@@ -41,7 +41,7 @@ public class Main {
     HAC hac = new HAC(HAC.METHOD_UPGMA);
     
     List<File> files = EtlReader.readAndSeparate(
-        "data/set3/output2.xml", comparator.getRequiredFileType());
+        "data/set3/output2.zip", comparator.getRequiredFileType());
     manager.compareFiles(files, matrix, comparator);
     
     Scanner in = new Scanner(System.in);
