@@ -36,7 +36,7 @@ public class EtlReader {
    *          file
    * @return list of {@link File} objects
    */
-  public static List<File> readAndSeparate(String path, int fileType) {
+  public static List<File> readAndSeparate(String path, int fileType, Parameters params) {
     System.out.println("INFO: Input file reading started.");
     int start = 0;
     int end = 0;
@@ -53,12 +53,14 @@ public class EtlReader {
       System.out.println("ERROR: EtlReader.readAndSeparate: Unsupported file type.");
       return null;
     }
+    System.out.println("INFO: ETL file successfully loaded.");
     
     // Normalize input file
     inFile = inFile.replaceAll(">[\\n\\s]*<", "><");    // Remove whitespace between tags
     String inFLower = inFile.toLowerCase();
     
     // Separate jobs
+    System.out.println("INFO: Separating ETL jobs.");
     while ((start = inFLower.indexOf("<job", end)) != -1) {
       end = inFLower.indexOf("</job>", start) + "</job>".length();
       if (end < start) {
@@ -83,13 +85,16 @@ public class EtlReader {
       int newId = result.size();    // result.size is next ID
       switch (fileType) {
         case Main.FILETYPE_QGRAMFILE:
-          f = processQGramFile(newId, jobName, jobXml);
+          f = processQGramFile(newId, jobName, jobXml, params.qGramSize);
           break;
         case Main.FILETYPE_SEQUENCEFILE: // fall-through
         default:
           f = processSequenceFile(newId, jobName, jobXml);
       }
       result.add(f);
+      if (result.size() % 10 == 0) {
+        System.out.println("INFO: Progress: " + result.size() + " ETL jobs found.");
+      }
     }
     
     System.out.println("INFO: Input file reading finished (" + result.size() + " ETL jobs).");
@@ -114,9 +119,9 @@ public class EtlReader {
    * @param jobName file (ETL job) name
    * @param jobXml file content (ETL job body)
    */
-  private static QGramFile processQGramFile(int id, String jobName, String jobXml) {
+  private static QGramFile processQGramFile(int id, String jobName, String jobXml, int q) {
     QGramFile f = new QGramFile(id, jobName);
-    f.createProfile(tokenize(jobXml), 2); // TODO extract fixed parameter q!
+    f.createProfile(tokenize(jobXml), q);
     return f;
   }
 

@@ -99,6 +99,10 @@ public class HAC {
 			clustering.remove(minB);
 			clustering.remove(minA);
 			clustering.add(newCluster);
+			if (clustering.size() % 10 == 0) {
+			  System.out.printf("INFO: Clustering progress: %.2f%%\n",
+			      (mergeDist / stopCondition * 100.0));
+			}
 		}
 
 		// If all files merged within merging threshold

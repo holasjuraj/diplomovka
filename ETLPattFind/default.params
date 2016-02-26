@@ -1,0 +1,49 @@
+### Default parameters ###
+
+# All parameters can be omitted, default value will be used.
+# Parameters names and values are case-insensitive.
+
+# Number of threads for comparing tasks. Must be greater than 0.
+# Default = 4
+threads: 4
+
+# Method used for determining distance of two files (ETL jobs). Value can be either name or code of
+# the method:
+# 0 = editDistance
+# 1 = Ukkonen
+# 2 = cosine
+# 3 = Jaccard
+# 4 = SorsenDice
+# 
+# Default = ukkonen
+comparing-method: ukkonen
+
+# If you use edit distance for comparing files, you can specify threshold for early stopping of the
+# algorithm. The earlier is stops, the faster it is, but provides slightly less accurate result.
+# Theoretically it should be greater or equal to clustering-threshold, but it works well even if
+# this condition is not met. Value must be at least 0.01 (1% of the algorithm will be executed), and
+# at most 1.0 (whole algorithm will be executed).
+# Default = 0.1
+editdistance-early-stopping: 0.1
+
+# If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorsen-Dice), you can
+# specify the size of q-gram, i.e. how many consecutive XML tokens will be "merged" into one logical
+# unit.
+# Default = 2
+qgram-size: 2
+
+# Merging threshold for clustering - two clusters are merged iff distance between them is less or
+# equal to this number (min. distance = 0.0, max. distance = 1.0). Roughly speaking, with lower
+# value you get more clusters (patterns) with very similar jobs, with higher value you get less
+# clusters with less similar jobs. Value must be between 0.0001 and 1.0.
+# Default = 0.05
+clustering-threshold: 0.05
+
+# Method used for determining distance of two clusters. Value can be either name or code of the
+# method:
+# 0 = UPGMA
+# 1 = CLink
+# 2 = SLink
+# 
+# Default = upgma
+clustering-method: upgma
