@@ -19,7 +19,7 @@ public class Parameters {
   public int hacMethod = HAC.METHOD_UPGMA;
   public int minClusterSize = 2;
   // Specific parameters with default values
-  public double editDistEst = 0.1;
+  public double editDistEst = 0.05;
   public int qGramSize = 2;
   
   // Labels
