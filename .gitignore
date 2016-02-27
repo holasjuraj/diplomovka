@@ -1,6 +1,7 @@
 # Project specific
 *.zip
 /**/data/
+/**/tasks/
 *.xls
 *.xlsx
 *.xlsm

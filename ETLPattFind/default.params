@@ -58,4 +58,4 @@ clustering-method: upgma
 # will be omitted from the result.
 # Type: integer
 # Default = 2
-minPatternSize = 2;
+min-pattern-size: 2

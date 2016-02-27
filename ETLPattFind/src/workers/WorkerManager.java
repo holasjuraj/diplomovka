@@ -52,7 +52,7 @@ public class WorkerManager {
     for (Worker w : workerPool) {
       w.start();
     }
-    // TODO join?
+    // TODO really join?
     try {
       for (Worker w : workerPool) {
         w.join();
@@ -92,7 +92,7 @@ public class WorkerManager {
    * @param files list of {@link File}s to be compared
    */
   private synchronized void prepareTaskPool(List<File> files) {
-    System.out.println("INFO: Preparing camparison tasks.");
+    System.out.println("INFO: Preparing comparison tasks.");
     assignedTasks = 0;
     taskPool = new ArrayList<>(files.size() * (files.size() + 1) / 2);
     int f1 = 0;

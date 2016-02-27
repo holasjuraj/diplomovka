@@ -1,5 +1,5 @@
 threads: 3
-comparing-method: 0
+comparing-method: ukkonen
 editdistance-early-stopping: 0.1
 qgram-size: 2
 clustering-threshold: 0.05

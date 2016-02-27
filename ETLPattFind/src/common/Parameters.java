@@ -2,6 +2,7 @@ package common;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import clustering.HAC;
@@ -34,7 +35,7 @@ public class Parameters {
     private static final String label_hmUpgma = "upgma";
     private static final String label_hmClink = "clink";
     private static final String label_hmSlink = "slink";
-  private static final String label_minClusterSize = "minPatternSize";
+  private static final String label_minClusterSize = "min-pattern-size";
   private static final String label_editDistEst = "editdistance-early-stopping";
   private static final String label_qGramSize = "qgram-size";
   
@@ -67,7 +68,15 @@ public class Parameters {
           in.nextLine();
           continue;
         }
-        String paramVal = in.next().toLowerCase().trim();
+        String paramVal;
+        try {
+          paramVal = in.next().toLowerCase().trim();
+        } catch (NoSuchElementException e) {
+          System.out.println(
+              "WARN: Parameters.Parameters: Unknown parameter \"" + paramName + "\"");
+          in.close();
+          return;
+        }
         
         // Number of workers
         if (paramName.equals(label_numberOfWorkers)) {
