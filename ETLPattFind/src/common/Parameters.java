@@ -16,6 +16,7 @@ public class Parameters {
   public int comparingMethod = Main.COMPARATOR_UKKONEN;
   public double hacThreshold = 0.05;
   public int hacMethod = HAC.METHOD_UPGMA;
+  public int minClusterSize = 2;
   // Specific parameters with default values
   public double editDistEst = 0.1;
   public int qGramSize = 2;
@@ -33,6 +34,7 @@ public class Parameters {
     private static final String label_hmUpgma = "upgma";
     private static final String label_hmClink = "clink";
     private static final String label_hmSlink = "slink";
+  private static final String label_minClusterSize = "minPatternSize";
   private static final String label_editDistEst = "editdistance-early-stopping";
   private static final String label_qGramSize = "qgram-size";
   
@@ -49,8 +51,8 @@ public class Parameters {
    */
   public Parameters(String paramFile) {
     try {
-      File f = new File(paramFile);
-      if (!f.exists()) {
+      File f;
+      if (paramFile == null || !(f = new File(paramFile)).exists()) {
         // Load default parameters
         System.out.println("WARN: Parameters file cannot be found, using default parameters.");
         return;
@@ -131,6 +133,15 @@ public class Parameters {
                 + paramName + "\", applying default value.");
           }
           continue;
+        }
+        
+        // Minimal cluster size
+        if (paramName.equals(label_minClusterSize)) {
+          Integer num = tryParseInt(paramName, paramVal, 1, Integer.MAX_VALUE, true);
+          if (num != null) {
+            minClusterSize = num.intValue();
+          }
+          continue;  
         }
 
         // Edit distance - early stopping threshold

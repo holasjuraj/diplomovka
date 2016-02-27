@@ -4,6 +4,7 @@
 # Parameters names and values are case-insensitive.
 
 # Number of threads for comparing tasks. Must be greater than 0.
+# Type: integer
 # Default = 4
 threads: 4
 
@@ -15,6 +16,7 @@ threads: 4
 # 3 = Jaccard
 # 4 = SorsenDice
 # 
+# Type: integer or string
 # Default = ukkonen
 comparing-method: ukkonen
 
@@ -23,12 +25,14 @@ comparing-method: ukkonen
 # Theoretically it should be greater or equal to clustering-threshold, but it works well even if
 # this condition is not met. Value must be at least 0.01 (1% of the algorithm will be executed), and
 # at most 1.0 (whole algorithm will be executed).
+# Type: float
 # Default = 0.1
 editdistance-early-stopping: 0.1
 
 # If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorsen-Dice), you can
 # specify the size of q-gram, i.e. how many consecutive XML tokens will be "merged" into one logical
 # unit.
+# Type: integer
 # Default = 2
 qgram-size: 2
 
@@ -36,6 +40,7 @@ qgram-size: 2
 # equal to this number (min. distance = 0.0, max. distance = 1.0). Roughly speaking, with lower
 # value you get more clusters (patterns) with very similar jobs, with higher value you get less
 # clusters with less similar jobs. Value must be between 0.0001 and 1.0.
+# Type: float
 # Default = 0.05
 clustering-threshold: 0.05
 
@@ -45,5 +50,12 @@ clustering-threshold: 0.05
 # 1 = CLink
 # 2 = SLink
 # 
+# Type: integer or string
 # Default = upgma
 clustering-method: upgma
+
+# Show only patterns, that contain at least minPatternSize ETL jobs. All patterns with less jobs
+# will be omitted from the result.
+# Type: integer
+# Default = 2
+minPatternSize = 2;

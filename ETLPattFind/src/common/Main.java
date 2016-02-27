@@ -5,6 +5,7 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class Main {
   
   public static final int FILETYPE_SEQUENCEFILE = 0;
   public static final int FILETYPE_QGRAMFILE = 1;
+  
+  public static final String OUTPUT_DIR = "data/output";
 
   public static void main(String[] args) {
     System.out.println("INFO: Initialization.");
@@ -38,7 +41,7 @@ public class Main {
 //    args[0] = "data/set1/btl_export.zip";
 //    args[0] = "data/set2/output2.xml";
     args[0] = "data/set3/output2.zip";
-    args[1] = "test.params";
+//    args[1] = "test.params";
     // /DEBUG
     if (args.length < 1) {
       System.out.println("ERROR: Main.main: No input file specified.");
@@ -103,13 +106,16 @@ public class Main {
 
     // Clusterize
     List<Dendrogram> clustering = hac.clusterize(files, matrix, params.hacThreshold);
-    HAC.sortClusters(clustering);
     
-    // Print results
-    System.out.println("INFO: Results:");
-    for (Dendrogram cluster : clustering) {
-      System.out.println(cluster.toStringNames());
-    }    
+    // Write results
+    writeResultsXml(inputFilePath, OUTPUT_DIR, clustering, params.minClusterSize);
+    // DEBUG
+//    System.out.println("INFO: Results:");
+//    HAC.sortClusters(clustering);
+//    for (Dendrogram cluster : clustering) {
+//      System.out.println(cluster.toStringNames());
+//    }
+    // /DEBUG
     System.out.println("INFO: All finished, total time: "
         + ((new Date().getTime()) - start.getTime()) + "ms");
   }
@@ -140,4 +146,52 @@ public class Main {
     System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
   }
 
+  /**
+   * Writes resulting clustering into XML file. Only clusters (patterns) with at least
+   * minClusterSize Files (jobs) are written to output file.
+   * @param inputPath path of the INPUT file - output file name will be constructed from it as
+   *          [input file name]_patterns.xml
+   * @param outDir path to directory, in which output file will be stored. Directory is created if
+   *          necessary.
+   * @param clustering clustering to be written. It will be sorted within this method.
+   * @param minClusterSize minimum number of files in a cluster
+   */
+  public static void writeResultsXml(
+      String inputPath, String outDir, List<Dendrogram> clustering, int minClusterSize) {
+    try {
+      int nameStart = Math.max(inputPath.lastIndexOf('/'), inputPath.lastIndexOf('\\'));
+      String inName = inputPath.substring(nameStart + 1);
+      int extStart = inName.lastIndexOf('.');
+      String outName = inName.substring(0, extStart) + "_patterns.xml";
+      java.io.File outDirRef = new java.io.File(outDir);
+      if (!outDirRef.exists()) {
+        outDirRef.mkdirs();
+      }
+      
+      HAC.sortClusters(clustering);
+      
+      PrintStream out = new PrintStream(
+          new FileOutputStream(outDir + "/" + outName), false, "UTF-8");
+      out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); // Header
+      out.println("<patterns inputFile=\"" + inName + "\">");    // Open root element
+      for (int i = 0; i < clustering.size(); i++) {
+        Dendrogram cluster = clustering.get(i);
+        if (cluster.size() < minClusterSize) {
+          continue;
+        }
+        out.println("\t<pattern id=\"" + i + "\">");             // Open cluster element
+        for (File job : cluster.files) {
+          out.println("\t\t<job>" + job.getName() + "</job>");   // Job element
+        }
+        out.println("\t</pattern>");                                // Close cluster element
+      }      
+      
+      out.println("</patterns>");                                // Close root element
+      out.close();      
+    } catch (FileNotFoundException | UnsupportedEncodingException e) {
+      System.out.println("ERROR: Main.writeResultsXml: Error writing output file.");
+      e.printStackTrace();
+    }
+  }
+  
 }
