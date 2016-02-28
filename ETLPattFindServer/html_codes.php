@@ -51,7 +51,7 @@ function html_start($page = false){
 
 				<div class="navbar-collapse collapse navbar-inverse-collapse top_nav">
 					<ul class="nav navbar-nav">
-						<li<?php if($page == "submit"){ echo ' class="active"';} ?>><a href="index.php">Submit new task</a></li>
+						<li<?php if($page == "submit"){ echo ' class="active"';} ?>><a href="submit.php">Submit new task</a></li>
 						<li<?php if($page == "results"){ echo ' class="active"';} ?>><a href="results.php">Results</a></li>
 					</ul>
 				</div>

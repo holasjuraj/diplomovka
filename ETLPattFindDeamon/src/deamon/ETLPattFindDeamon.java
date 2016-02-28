@@ -20,12 +20,12 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class ETLPattFindDeamon {
-  public static final String SYSOUT_FILE = "deamon_sysout.txt";
-  public static final String NEW_TASK_DIR = "newTaskInfo";
+  public static final String SYSOUT_FILE = "data/deamon_sysout.txt";
+  public static final String NEW_TASK_DIR = "data/newTaskInfo";
   public static final String JAR_PATH = "ETLPattFind.jar";
 
   public static void main(String[] args) {
-//    PrintStream output = redirectOutput(SYSOUT_FILE);
+    PrintStream output = redirectOutput(SYSOUT_FILE);
     WatchService watcher;
     try {
       sysOutTimestamp("ETLPattFind Deamon started");
@@ -69,7 +69,7 @@ public class ETLPattFindDeamon {
       sysOutTimestamp("ERROR: Cannot find direcotry for new tasks.");
       e.printStackTrace(System.out);
     } finally {
-//      resetOutput(output);
+      resetOutput(output);
     }
   }
 
