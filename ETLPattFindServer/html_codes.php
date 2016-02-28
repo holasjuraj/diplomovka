@@ -24,10 +24,32 @@ function html_start($page = false){
 	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="js/respond.min.js"></script>
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/myFunctions.js"></script>
 	<script>
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').tooltip();
+		});
+
+		jQuery(document).ready(function() {
+			var offset = $(document).height() - $(window).height() - jQuery('.footer').height() - 50;
+			var duration = 250;
+
+			if (offset < 0) {
+				jQuery('.scroll-down').hide();
+			};
+
+			jQuery(window).scroll(function() {
+				if (jQuery(this).scrollTop() < offset) {
+					jQuery('.scroll-down').fadeIn(0);
+				} else {
+					jQuery('.scroll-down').fadeOut(0);
+				}
+			});
+			
+			jQuery('.scroll-down').click(function(event) {
+				event.preventDefault();
+				jQuery('html, body').animate({scrollTop: $(document).height()}, duration);
+				return false;
+			})
 		});
 	</script>
 	
@@ -64,6 +86,7 @@ function html_start($page = false){
 	<div class="container sections-wrapper">
 		<div class="row">
 			<main>
+			
 			<div class="primary col-lg-12 col-md-12 col-sm-12 col-xs-12">
 				<div class="section">
 <?php

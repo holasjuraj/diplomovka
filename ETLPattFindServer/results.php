@@ -6,7 +6,10 @@
 
 	include("uploadAndLaunch.php");
 
-	echo '<h4 class="heading">Submitted tasks</h4>';
+	?>
+	<a href="#" class="scroll-down"><span class="glyphicon glyphicon-chevron-down"></span></a>
+	<h4 class="heading">Submitted tasks</h4>
+	<?php
 
 	$tasksDirList = glob($tasksDir."/*");
 	$countTasks = count($tasksDirList);
@@ -71,7 +74,9 @@
 		<?php
 	}
 	?>
-	<a href="results.php"><button type="button" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span> Refresh</button></a>
+	<a href="">
+		<button type="button" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+	</a>
 	<div id="end"></div>
 	<?php
 	} // if (authorised())

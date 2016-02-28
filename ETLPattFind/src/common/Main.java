@@ -30,6 +30,7 @@ public class Main {
   public static final int FILETYPE_SEQUENCEFILE = 0;
   public static final int FILETYPE_QGRAMFILE = 1;
   
+  /** Manual for correct command line usage. */
   public static final String USAGE =
       "\nUsage: java -jar ETLPattFind.jar <inputfile> [-options]\n"
       + "    <inputfile> must be either .xml file, or .zip archive (not .rar or .tar.gz!)\n"

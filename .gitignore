@@ -10,11 +10,12 @@
 *.class
 .mtj.tmp/
 *.jar
+*.jardesc
 *.war
 *.ear
 /**/.settings/
 /**/.metadata/
-.recommenders/
+/**/.recommenders/
 /**/bin/
 RemoteSystemsTempFiles/
 

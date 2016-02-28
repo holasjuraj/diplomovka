@@ -282,21 +282,20 @@ body.no-js .navbar ul li:hover > ul.dropdown-menu{
 	display: block;
 }
 
-.back-to-top {
+.scroll-down {
     position: fixed;
     bottom: 2em;
     right: 0px;
     text-decoration: none;
 	color: #545e69;
-    background-color: rgba(235, 235, 235, 0.7);
+    background-color: rgba(245, 245, 245, 0.7);
     font-size: 12px;
     padding: 1em;
     z-index: 10;
-    display: none;
 }
 
-.back-to-top:hover {    
-    background-color: rgba(235, 235, 235, 0.9);
+.scroll-down:hover {    
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
 /* Info Section */

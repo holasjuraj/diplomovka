@@ -3,8 +3,11 @@
 	html_start("results");
 
 	if (authorised()) {
+		?>
+		<a href="#" class="scroll-down"><span class="glyphicon glyphicon-chevron-down"></span></a>
+		<h4 class="heading">Task status</h4>
+		<?php
 
-		echo '<h4 class="heading">Task status</h4>';
 		if (!isset($_GET["task"]) || !file_exists($tasksDir."/".$_GET["task"])) {
 			alertMsg("danger", "Invalid task ID!");
 		} else {
@@ -35,6 +38,12 @@
 			echo "</pre>\n";
 		}
 		echo '<div id="end"></div>';
+
+		?>
+		<a href="">
+			<button type="button" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+		</a>
+		<?php
 		
 	} // if (authorised())
 	html_end("home");

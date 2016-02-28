@@ -15,9 +15,9 @@
 
 		$destination = false;
 		if ($status && isset($_FILES["inputFile"]["error"]) && $_FILES["inputFile"]["error"]!=4) {
-			$filename = clr(pathinfo($_FILES["inputFile"]["name"], PATHINFO_FILENAME));                 // $filename == "file";
-			$basename = clr(pathinfo($_FILES["inputFile"]["name"], PATHINFO_BASENAME));                 // $basename == "file.ext";
-			$extension = clr(strtolower(pathinfo($_FILES["inputFile"]["name"], PATHINFO_EXTENSION)));   // $extension == "ext";
+			$filename = pathinfo($_FILES["inputFile"]["name"], PATHINFO_FILENAME);                 // $filename == "file";
+			$basename = pathinfo($_FILES["inputFile"]["name"], PATHINFO_BASENAME);                 // $basename == "file.ext";
+			$extension = strtolower(pathinfo($_FILES["inputFile"]["name"], PATHINFO_EXTENSION));   // $extension == "ext";
 			$supported_extensions = array("xml", "zip");
 
 			if (!in_array($extension, $supported_extensions)) {

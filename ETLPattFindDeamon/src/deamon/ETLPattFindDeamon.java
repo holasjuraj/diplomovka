@@ -17,13 +17,26 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * Deamon for ETLPattFind server. Watches over specified directory, and if new task file appears,
+ * deamon will prepare and launch ETLPattFind program.
+ * @author Juraj
+ */
 public class ETLPattFindDeamon {
+  /** File to which standard output should be redirected. */
   public static final String SYSOUT_FILE = "data/deamon_sysout.txt";
+  /** Directory to watch for new task files. */
   public static final String NEW_TASK_DIR = "data/newTaskInfo";
+  /** Path to ETLPattFind.jar that will be executed. */
   public static final String JAR_PATH = "ETLPattFind.jar";
 
+  /**
+   * Launches the deamon - redirect output, attach watcher for new task directory.
+   * @param args no arguments are expected
+   */
   public static void main(String[] args) {
     PrintStream output = redirectOutput(SYSOUT_FILE);
     WatchService watcher;
@@ -73,59 +86,76 @@ public class ETLPattFindDeamon {
     }
   }
 
+  /**
+   * Process new task based on given info file. Parse the info file, move it to task directory,
+   * create .params file and launch ETLPattFind with proper arguments.
+   * @param infoFileName path to info file describing the new task. The file follow specified
+   *          structure:
+   *          <ul>
+   *          <li>line with name of the task</li>
+   *          <li>line with start time of the task</li>
+   *          <li>line with path to task directory</li>
+   *          <li>line with name of the input file (its path relative to task directory</li>
+   *          <li>rest of the lines are copied to .params file</li>
+   *          </ul>
+   */
   public static void launchTask(String infoFileName) {
     // Parse information from info file
     sysOutTimestamp("Parsing input information");
     Scanner in;
     try {
       in = new Scanner(new File(infoFileName));
+      in.nextLine(); // Skip task name
+      in.nextLine(); // Skip start time
+      String taskDir = in.nextLine();
+      String inputFile = in.nextLine();
+      String paramFile = taskDir + "/parameters.params";
+      // Make .param file
+      try {
+        PrintStream paramOut = new PrintStream(new File(paramFile));
+        while (in.hasNext()) {
+          paramOut.println(in.nextLine());
+        }
+        paramOut.close();
+      } catch (FileNotFoundException e) {
+        sysOutTimestamp("ERROR: Cannot create .params file.");
+        e.printStackTrace(System.out);
+      }    
+      in.close();
+      // Move info file to task directory
+      try {
+        Files.move(FileSystems.getDefault().getPath(infoFileName),
+                   FileSystems.getDefault().getPath(taskDir + "/inputInfo.txt"));
+      } catch (IOException e) {
+        sysOutTimestamp("ERROR: Cannot move input info file to task directory.");
+        e.printStackTrace(System.out);
+      }
+      
+      // Launch the ETLPattFind
+      try {
+        sysOutTimestamp("Launching ETLPattFind");
+        String[] command = new String[] {
+            "java", "-jar", JAR_PATH, taskDir + "/" + inputFile,
+            "-p", paramFile,
+            "-s", taskDir + "/sysout.txt"
+        };
+        Runtime.getRuntime().exec(command);
+      } catch (IOException e) {
+        sysOutTimestamp("ERROR: Running ETLPattFind - I/O error occured.");
+        e.printStackTrace(System.out);
+      } catch (SecurityException e) {
+        sysOutTimestamp("ERROR: Running ETLPattFind - "
+            + "security manager`s checkExec method doesn't allow creation of the subprocess.");
+        e.printStackTrace(System.out);
+      }
     } catch (FileNotFoundException e) {
       sysOutTimestamp("ERROR: Cannot find input information file.");
       e.printStackTrace(System.out);
       return;
-    }
-    in.nextLine(); // Skip task name
-    in.nextLine(); // Skip start time
-    String taskDir = in.nextLine();
-    String inputFile = in.nextLine();
-    String paramFile = taskDir + "/parameters.params";
-    // Make .param file
-    try {
-      PrintStream paramOut = new PrintStream(new File(paramFile));
-      while (in.hasNext()) {
-        paramOut.println(in.nextLine());
-      }
-      paramOut.close();
-    } catch (FileNotFoundException e) {
-      sysOutTimestamp("ERROR: Cannot create .params file.");
+    } catch (NoSuchElementException e) {
+      sysOutTimestamp("ERROR: Input information file corrupted.");
       e.printStackTrace(System.out);
-    }    
-    in.close();
-    // Move info file to task directory
-    try {
-      Files.move(FileSystems.getDefault().getPath(infoFileName),
-                 FileSystems.getDefault().getPath(taskDir + "/inputInfo.txt"));
-    } catch (IOException e) {
-      sysOutTimestamp("ERROR: Cannot move input info file to task directory.");
-      e.printStackTrace(System.out);
-    }
-    
-    // Launch the ETLPattFind
-    try {
-      sysOutTimestamp("Launching ETLPattFind");
-      String[] command = new String[] {
-          "java", "-jar", JAR_PATH, taskDir + "/" + inputFile,
-          "-p", paramFile,
-          "-s", taskDir + "/sysout.txt"
-      };
-      Runtime.getRuntime().exec(command);
-    } catch (IOException e) {
-      sysOutTimestamp("ERROR: Running ETLPattFind - I/O error occured.");
-      e.printStackTrace(System.out);
-    } catch (SecurityException e) {
-      sysOutTimestamp("ERROR: Running ETLPattFind - "
-          + "security manager`s checkExec method doesn't allow creation of the subprocess.");
-      e.printStackTrace(System.out);
+      return;
     }
   }
 

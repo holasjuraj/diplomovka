@@ -46,7 +46,7 @@ public class Parameters {
   
   /**
    * Creates parameter set based on specified parameter file. If a value cannot be parsed, it is set
-   * to default with a warning message. If a parameter is ommited, it is set to default value
+   * to default with a warning message. If a parameter is omitted, it is set to default value
    * without warning.
    * @param paramFile path to parameter file
    */
