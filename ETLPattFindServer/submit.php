@@ -16,7 +16,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="text" class="form-control" id="taskName" name="taskName" value="Unnamed task">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Your own, human-readable name for the task.
 						</p>
@@ -30,7 +30,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="file" class="form-control" id="inputFile" name="inputFile">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p class='text-left'>
 							Upload input ETL file. You can use one of two forms:<br />
 							<ul class='text-left'>
@@ -49,7 +49,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="text" class="form-control" id="min-pattern-size" name="min-pattern-size" value="2">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Show only patterns, that contain at least this number of ETL jobs. All patterns with less jobs will be omitted from the result.
 						</p>
@@ -68,7 +68,7 @@
 							<option selected>4</option>
 						</select>
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Number of threads used for this task. If you`re not running several tasks in parallel, just leave 4.
 						</p>
@@ -109,7 +109,7 @@
 							<option value="sorsenDice">Sorsen-Dice coefficient</option>
 						</select>
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Method used for determining distance of two ETL jobs.<br />
 							<ul class='text-left'>
@@ -148,7 +148,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="text" class="form-control" id="editdistance-early-stopping" name="editdistance-early-stopping" value="0.05">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							If you use edit distance for comparing files, you can specify threshold for early stopping of the
 							algorithm. The earlier is stops, the faster it is, but provides slightly less accurate result.
@@ -166,7 +166,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="text" class="form-control" id="qgram-size" name="qgram-size" value="2">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorsen-Dice), you can
 							specify the size of q-gram, i.e. how many consecutive XML tokens will be 'merged' into one logical unit.
@@ -192,7 +192,7 @@
 							<option value="slink">S-Link</option>
 						</select>
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Method used for determining distance of two clusters.<br />
 							<ul class='text-left'>
@@ -221,7 +221,7 @@
 					<div class="col-lg-4 col-xs-6">
 						<input type="text" class="form-control" id="clustering-threshold" name="clustering-threshold" value="0.05">
 					</div>
-					<a href="#" data-toggle="tooltip" data-html="true" data-placement="right" title="
+					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
 							Merging threshold for clustering - two clusters are merged if and only if distance between them is less or
 							equal to this number (distance is always from range &lt;0.0, 1.0&gt;).<br />

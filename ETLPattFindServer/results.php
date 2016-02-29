@@ -6,6 +6,16 @@
 
 	include("uploadAndLaunch.php");
 
+	if (isset($_POST["star"])) {
+		foreach ($_POST["star"] as $taskID => $starArr) {
+			foreach ($starArr as $star => $temp) {
+				$ratingFile = fopen("$tasksDir/$taskID/rating.txt", "w");
+				fwrite($ratingFile, "$star\n");
+				fclose($ratingFile);
+			}
+		}
+	}
+
 	?>
 	<a href="#" class="scroll-down"><span class="glyphicon glyphicon-chevron-down"></span></a>
 	<h4 class="heading">Submitted tasks</h4>
@@ -27,6 +37,7 @@
 						<th>Status</th>
 						<th>Ready</th>
 						<th>Download result</th>
+						<th>Rate result</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -39,6 +50,7 @@
 			if (!file_exists("$dir/inputInfo.txt")) {
 				continue;
 			}
+			$taskID = substr($dir, strrpos($dir, "/") + 1);
 			$infoFile = fopen("$dir/inputInfo.txt", "r");
 			$taskName = fgets($infoFile);
 			$startTime = fgets($infoFile);
@@ -49,6 +61,13 @@
 			$inputFilePure = substr($inputFile, 0, strrpos($inputFile, "."));
 			$outputFile = "$dir/".$inputFilePure."_patterns.xml";
 			$isReady = file_exists($outputFile);
+
+			$rating = 0;
+			if (file_exists("$dir/rating.txt")) {
+				$ratingFile = fopen("$dir/rating.txt", "r");
+				$rating = 0 + fgets($ratingFile);
+				fclose($ratingFile);
+			}
 
 			echo "<tr>\n";
 			echo "<td>$taskName</td>\n";
@@ -65,6 +84,14 @@
 				echo "<span class=\"glyphicon glyphicon-remove\"></span></td>\n";
 				echo "<td></td>\n";
 			}
+			echo '<td class="text-center"><form action="" method="post">';
+			for ($r = 1; $r <= 5; $r++) {
+				echo '<button class="star" type="submit" name="'."star[$taskID][$r]".'">'
+					.'<a href="#" data-toggle="tooltip" title="'.$r.'">'
+					.'<span class="glyphicon glyphicon-star'.(($rating >= $r) ? "" : "-empty").'">'
+					.'</span></a></button>&nbsp;';
+			}
+			echo "</form></td>\n";
 			echo "</tr>\n";
 		}
 		?>
