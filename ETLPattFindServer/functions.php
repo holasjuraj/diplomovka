@@ -3,6 +3,7 @@
 	$tasksDir = "data/tasks";
 	$password = "klimek2016etl";
 
+	date_default_timezone_set("Europe/Bratislava");
 	session_start();
 	include("html_codes.php");
 

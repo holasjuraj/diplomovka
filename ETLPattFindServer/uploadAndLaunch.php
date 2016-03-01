@@ -1,6 +1,6 @@
 <?php
 	if (isset($_POST["submit"])){
-		usleep(1000000); // Sleep for 1 second - wait until deamon creates info file
+		$oldmask = umask(0);
 
 		$status = true;
 		$t = time();
@@ -26,7 +26,7 @@
 			} else {
 
 				if (!file_exists($thisTaskDir)) {
-					mkdir($thisTaskDir, 0711, true);
+					mkdir($thisTaskDir, 0777);
 				}
 				$destination = "$thisTaskDir/$basename";
 				$temp_name = $_FILES["inputFile"]["tmp_name"];
@@ -37,7 +37,7 @@
 					$status = false;
 				}
 				else{
-					chmod($destination, 0700);	// apache do not have access to the file from now!
+					chmod($destination, 0777);
 				}
 			}
 		}
@@ -55,10 +55,15 @@
 					."qgram-size: ".$_POST["qgram-size"]."\n"
 					."clustering-method: ".$_POST["clustering-method"]."\n"
 					."clustering-threshold: ".$_POST["clustering-threshold"]."\n";
-			$inputInfoFile = fopen("$newTaskDir/$timestamp-inputInfo.txt", "w");
+			$inputInfoPath = "$newTaskDir/$timestamp-inputInfo.txt";
+			$inputInfoFile = fopen($inputInfoPath, "w");
 			fwrite($inputInfoFile, $text);
 			fclose($inputInfoFile);
+			chmod($inputInfoPath, 0777);
 			alertMsg("success", "Task successfully submited!");
 		}
+
+		umask($oldmask);
+		usleep(1000000); // Sleep for 1 second - wait until deamon creates info file
 	}
 ?>

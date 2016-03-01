@@ -26,8 +26,11 @@ import java.util.Scanner;
  * @author Juraj
  */
 public class ETLPattFindDeamon {
-  /** File to which standard output should be redirected. */
-  public static final String SYSOUT_FILE = "data/deamon_sysout.txt";
+  /**
+   * Path and name prefix for file to which standard output should be redirected. Timestamp will be
+   * added to name.
+   */
+  public static final String SYSOUT_FILE_PREFIX = "data/deamon_sysout_";
   /** Directory to watch for new task files. */
   public static final String NEW_TASK_DIR = "data/newTaskInfo";
   /** Path to ETLPattFind.jar that will be executed. */
@@ -38,7 +41,7 @@ public class ETLPattFindDeamon {
    * @param args no arguments are expected
    */
   public static void main(String[] args) {
-    PrintStream output = redirectOutput(SYSOUT_FILE);
+    PrintStream output = redirectOutput(SYSOUT_FILE_PREFIX + (new Date()).getTime() + ".txt");
     WatchService watcher;
     try {
       sysOutTimestamp("ETLPattFind Deamon started");
