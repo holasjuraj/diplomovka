@@ -22,11 +22,10 @@ public class DistanceMatrix {
   public FileComparison put(FileComparison fc) {
     lock.writeLock().lock();
     try {
-      int[] ids = new int[] {
-          fc.getFiles()[0].getId(),
-          fc.getFiles()[1].getId() };
+      int id1 = fc.getFiles()[0].getId();
+      int id2 = fc.getFiles()[1].getId();
 
-      return matrix.put(new Pair<Integer>(ids[0], ids[1]), fc);
+      return matrix.put(new Pair<Integer>(id1, id2), fc);
     } finally {
       lock.writeLock().unlock();
     }

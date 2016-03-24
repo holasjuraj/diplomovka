@@ -8,23 +8,23 @@ import common.File;
 import common.FileComparison;
 
 public class WorkerTriIneq extends Thread {
-  public static final double LB_MINIMUM = 0.2;
+  private final WorkerManagerTriIneq manager;
+  private final double lbMinimum;
   /**
    * If range defined by low bound and high bound is smaller than this, then it is considered as
    * exact comparison instead of approximation.
    */
-  public static final double MIN_BOUND_RANGE = 0.001;
-  
-  private final WorkerManagerTriIneq manager;
+  private final double minBoundRange;
   private volatile double status;
   
   /**
    * Initialization of worker.
-   * @param workerManagerTriIneq object managing my execution and tasks
+   * @param manager object managing my execution and tasks
    */
-  public WorkerTriIneq(WorkerManagerTriIneq workerManagerTriIneq) {
-    this.manager = workerManagerTriIneq;
-    // TODO ?
+  public WorkerTriIneq(WorkerManagerTriIneq manager) {
+    this.manager = manager;
+    this.lbMinimum = manager.params.schTriIneqLBMin;
+    this.minBoundRange = manager.params.schTriIneqBoundRange;
   }
 
   /**
@@ -73,10 +73,10 @@ public class WorkerTriIneq extends Thread {
         }
 
         // Accept or reject approximation
-        if (edge.getHighBound() - edge.getLowBound() < MIN_BOUND_RANGE) {
+        if (edge.getHighBound() - edge.getLowBound() < minBoundRange) {
           // Bounding range is so small it is considered exact -> accept
           edge.setDistanceExact((edge.getLowBound() + edge.getHighBound()) / 2);
-        } else if (edge.getLowBound() < LB_MINIMUM) {
+        } else if (edge.getLowBound() < lbMinimum) {
           // Lower bound is too low -> reject, compute exact
           double dist = manager.getComparator().distance(from, to);
           edge.setDistanceExact(dist);

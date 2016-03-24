@@ -15,12 +15,15 @@ public class Parameters {
   // Common parameters with default values
   public int numberOfWorkers = 4;
   public int comparingMethod = Main.COMPARATOR_UKKONEN;
+  public int scheduler = Main.SCHEDULER_FULL_COMP;
   public double hacThreshold = 0.05;
   public int hacMethod = HAC.METHOD_UPGMA;
   public int minClusterSize = 2;
   // Specific parameters with default values
   public double editDistEst = 0.05;
   public int qGramSize = 2;
+  public double schTriIneqLBMin = 0.05;
+  public double schTriIneqBoundRange = 0.001;
   
   // Labels
   private static final String label_numberOfWorkers = "threads";
@@ -30,6 +33,9 @@ public class Parameters {
     private static final String label_cmCosine = "cosine";
     private static final String label_cmJaccard = "jaccard";
     private static final String label_cmSorsenDice = "sorsendice";
+  private static final String label_scheduler = "scheduler";
+    private static final String label_schFullComp = "full-comparison";
+    private static final String label_schTriIneq = "tri-ineq";
   private static final String label_hacThreshold = "clustering-threshold";
   private static final String label_hacmethod = "clustering-method";
     private static final String label_hmUpgma = "upgma";
@@ -38,6 +44,8 @@ public class Parameters {
   private static final String label_minClusterSize = "min-pattern-size";
   private static final String label_editDistEst = "editdistance-early-stopping";
   private static final String label_qGramSize = "qgram-size";
+  private static final String label_schTriIneqLBMin = "scheduler-tri-ineq--lb-minimum";
+  private static final String label_schTriIneqBoundRange = "scheduler-tri-ineq--min-bound-range";
   
   /**
    * Creates new parameter set with all default values.
@@ -112,6 +120,26 @@ public class Parameters {
           }
           continue;
         }
+        
+        // Scheduler
+        if (paramName.equals(label_scheduler)) {
+          // Try interpret as number
+          Integer num = tryParseInt(paramName, paramVal, 0, Main.SCHEDULER_TRI_INEQ, false);
+          if (num != null) {
+            scheduler = num.intValue();
+            continue;
+          }
+          // Interpret as string
+          if (paramVal.equals(label_schFullComp)) {
+            scheduler = Main.SCHEDULER_FULL_COMP;
+          } else if (paramVal.equals(label_schTriIneq)) {
+            scheduler = Main.SCHEDULER_TRI_INEQ;
+          } else {
+            System.out.println("WARN: Parameters.Parameters: Unrecognized value of \""
+                + paramName + "\", applying default value.");
+          }
+          continue;
+        }
 
         // HAC threshold
         if (paramName.equals(label_hacThreshold)) {
@@ -169,6 +197,24 @@ public class Parameters {
             qGramSize = num.intValue();
           }
           continue;  
+        }
+
+        // TriIneq scheduler - low bound minimum
+        if (paramName.equals(label_schTriIneqLBMin)) {
+          Double num = tryParseDouble(paramName, paramVal, 0.0001, 1.0, true);
+          if (num != null) {
+            schTriIneqLBMin = num.doubleValue();
+          }
+          continue;          
+        }
+
+        // TriIneq scheduler - minimal bound range
+        if (paramName.equals(label_schTriIneqBoundRange)) {
+          Double num = tryParseDouble(paramName, paramVal, 0.0, 1.0, true);
+          if (num != null) {
+            schTriIneqBoundRange = num.doubleValue();
+          }
+          continue;          
         }
         
         // None of previous

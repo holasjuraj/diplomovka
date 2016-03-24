@@ -34,6 +34,16 @@ public class FileComparison {
 			this.f2 = f1;			
 		}
 	}
+  
+  public FileComparison(File f1, File f2, double exactDistance) {
+    this(f1, f2);
+    setDistanceExact(exactDistance);
+  }
+  
+  public FileComparison(File f1, File f2, double lowBound, double highBound) {
+    this(f1, f2);
+    setDistanceApprox(lowBound, highBound);
+  }
 
 	/**
 	 * @return two-field array of compared {@link File}s
@@ -85,8 +95,8 @@ public class FileComparison {
 		checkDistRange(lowBound);
 		checkDistRange(highBound);
 		if (highBound < lowBound) {
-      System.out.println("WARN: FileComparison.setDistanceApprox: High bound " + highBound
-          + " is greater than low bound " + lowBound + ".");
+      System.out.println("WARN: FileComparison.setDistanceApprox: Low bound " + lowBound
+          + " is greater than high bound " + highBound + ".");
 		}
 		this.lowBound  = lowBound;
 		this.highBound = highBound;

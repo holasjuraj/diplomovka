@@ -6,6 +6,8 @@ import java.util.List;
 
 import common.DistanceMatrix;
 import common.File;
+import common.FileComparison;
+import common.Parameters;
 import filecomparators.FileComparator;
 import workers.WorkerTriIneq.WorkerTask;
 
@@ -20,6 +22,7 @@ public class WorkerManagerTriIneq {
   private List<WorkerTask> stage1TaskPool;
   private List<WorkerTask> stage2TaskPool;
   private List<WorkerTriIneq> workerPool;
+  final Parameters params;
   private final int numWorkers;
   private int assignedTasks;
   private int stage = 1;
@@ -28,8 +31,9 @@ public class WorkerManagerTriIneq {
    * Creates new manager with a given number of {@link WorkerTriIneq}s. Workers are created, but not
    * yet launched.
    */
-  public WorkerManagerTriIneq(int numWorkers) {
-    this.numWorkers = numWorkers;
+  public WorkerManagerTriIneq(Parameters params) {
+    this.params = params;
+    this.numWorkers = params.numberOfWorkers;
   }
   
   private void createAndStartWorkers() {
@@ -142,6 +146,10 @@ public class WorkerManagerTriIneq {
       for (int j = i + 1; j < sets.size(); j++) {
         stage2TaskPool.add(new WorkerTask(sets.get(i), sets.get(j)));
       }
+    }
+    // Fill matrix diagonal
+    for (File f : files) {
+      distMatrix.put(FileComparison.getSelfComparison(f));
     }
   }
   
