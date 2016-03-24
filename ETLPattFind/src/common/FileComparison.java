@@ -84,6 +84,10 @@ public class FileComparison {
 	public void setDistanceApprox(double lowBound, double highBound) {
 		checkDistRange(lowBound);
 		checkDistRange(highBound);
+		if (highBound < lowBound) {
+      System.out.println("WARN: FileComparison.setDistanceApprox: High bound " + highBound
+          + " is greater than low bound " + lowBound + ".");
+		}
 		this.lowBound  = lowBound;
 		this.highBound = highBound;
 		exact = false;

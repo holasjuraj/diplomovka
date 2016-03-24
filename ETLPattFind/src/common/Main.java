@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import filecomparators.JaccardComparator;
 import filecomparators.SorsenDiceComparator;
 import filecomparators.UkkonenComparator;
 import workers.WorkerManager;
+import workers.WorkerManagerTriIneq;
 
 public class Main {
   public static final int COMPARATOR_EDITDISTANCE = 0;
@@ -43,22 +45,89 @@ public class Main {
       + "    -s <sysoutfile>     redirect system output to this file. Note that system\n"
       + "                        output prints only status messages, not the results.";
 
+  public static void dummyRun() {
+    DistanceMatrix matrix = new DistanceMatrix();
+    
+    List<File> files = new ArrayList<>();
+    QGramFile f;
+
+    // F0
+    f = new QGramFile(0, "F0");
+    f.createProfile(Arrays.asList("a", "b"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F1
+    f = new QGramFile(1, "F1");
+    f.createProfile(Arrays.asList("a", "b"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F2
+    f = new QGramFile(2, "F2");
+    f.createProfile(Arrays.asList("a", "b"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F3
+    f = new QGramFile(3, "F3");
+    f.createProfile(Arrays.asList("a", "b"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+
+    // F4
+    f = new QGramFile(4, "F4");
+    f.createProfile(Arrays.asList("c", "d"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F5
+    f = new QGramFile(5, "F5");
+    f.createProfile(Arrays.asList("c", "d"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F6
+    f = new QGramFile(6, "F6");
+    f.createProfile(Arrays.asList("c", "d"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+    // F7
+    f = new QGramFile(7, "F7");
+    f.createProfile(Arrays.asList("c", "d"), 1);
+    files.add(f);
+    matrix.put(FileComparison.getSelfComparison(f));
+
+    String inputFilePath = "data/set1/btl_export.zip";
+//    String inputFilePath = "data/set2/output2.xml";
+    FileComparator comparator = new UkkonenComparator();
+    Parameters params = new Parameters();
+    params.numberOfWorkers = 3;
+    WorkerManagerTriIneq manager = new WorkerManagerTriIneq(params.numberOfWorkers);
+    
+    files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
+
+    manager.compareFiles(files, matrix, comparator);    
+  }
+  
   public static void main(String[] args) {
     PrintStream sysout = System.out;
     try {
       Date start = new Date();
+      
+      // DEBUG
+      dummyRun();
+      if (start.toString() != null) {
+        return;
+      }
+      // /DEBUG
   
       // DEBUG
-  //    args = new String[7];
-  ////    args[0] = "data/set1/btl_export.zip";
-  ////    args[0] = "data/set2/output2.xml";
-  //    args[0] = "data/set3/output2.zip";
-  ////    args[1] = "-s";
-  ////    args[2] = "data/syso.txt";
-  //    args[3] = "-p";
-  //    args[4] = "test.params";
-  ////    args[5] = "-o";
-  ////    args[6] = "data/set3/testout.xml";
+      args = new String[7];
+//      args[0] = "data/set1/btl_export.zip";
+      args[0] = "data/set2/output2.xml";
+//      args[0] = "data/set3/output2.zip";
+//      args[1] = "-s";
+//      args[2] = "data/syso.txt";
+      args[3] = "-p";
+      args[4] = "test.params";
+//      args[5] = "-o";
+//      args[6] = "data/set3/testout.xml";
       // /DEBUG
       
       
