@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import common.DistanceMatrix;
 import common.File;
@@ -56,55 +58,51 @@ public class HAC {
 			clustering.add(new Dendrogram(f));
 		}
 		
-		// Merge to one cluster
-		while (clustering.size() > 1) {
-			double minDist = Double.MAX_VALUE;	// Minimal distance between clusters A and B		 
-			int minA = 0, minB = 1;		          // Indexes of clusters A and B with minimal distance
-			for (int ia = 0; ia < clustering.size(); ia++) {
-				for (int ib = ia + 1; ib < clustering.size(); ib++) {
-					double d = 1.0;
-					switch (joinMethod) {
-						case METHOD_CLINK:
-							d = cLink(clustering.get(ia), clustering.get(ib), distMatrix);
-							break;
-						case METHOD_SLINK:
-							d = sLink(clustering.get(ia), clustering.get(ib), distMatrix);
-							break;
-						case METHOD_UPGMA:	// fall-through
-						default:
-							d = upgma(clustering.get(ia), clustering.get(ib), distMatrix);
-					}
-					if (d < minDist) {
-						// new best choice for merge
-						minDist = d;
-						minA = ia;
-						minB = ib;
-					}
-				}
-			}
-			
-			double mergeDist = minDist;
-			
-			// Stop condition - return if merge distance reaches given threshold
-			if (mergeDist > stopCondition) {
-				System.out.println("INFO: Clustering finished, time: "
-				    + ((new Date().getTime()) - start.getTime()) + "ms");
-				return clustering;
-			}
-			
-			// Merge two clusters
-			Dendrogram a = clustering.get(minA);
-			Dendrogram b = clustering.get(minB);
-			Dendrogram newCluster = new Dendrogram(a, b, mergeDist);
-			clustering.remove(minB);
-			clustering.remove(minA);
-			clustering.add(newCluster);
-			if (clustering.size() % 10 == 0) {
-			  System.out.printf("INFO: Clustering progress: %.2f%%\n",
-			      (mergeDist / stopCondition * 100.0));
-			}
-		}
-
+		// Initialize distances, fill cluster.nearest queues
+    for (int ia = 0; ia < clustering.size(); ia++) {
+      for (int ib = ia + 1; ib < clustering.size(); ib++) {
+        Dendrogram a = clustering.get(ia);
+        Dendrogram b = clustering.get(ib);
+        ClusterDistance d = getClusterDist(a, b, distMatrix, joinMethod);
+        a.nearest.add(d);
+        b.nearest.add(d);
+      }
+    }
+		
+    // Merge to one cluster
+    while (clustering.size() > 1) {
+      // Find best match (closest clusters)
+      ClusterDistance best = new ClusterDistance(null, null, Double.MAX_VALUE, Double.MAX_VALUE);
+      for (Dendrogram c : clustering) {
+        ClusterDistance queueHead = c.nearest.peek();
+        if (queueHead.lowBound < best.lowBound) {
+          best = queueHead;
+        }
+      }
+      // Stop condition - return if merge distance reaches given threshold
+      if (best.lowBound > stopCondition) {
+        System.out.println("INFO: Clustering finished, time: "
+            + ((new Date().getTime()) - start.getTime()) + "ms");
+        return clustering;
+      }
+      // Merge clusters
+      Dendrogram newClus = mergeClusters(clustering, best);
+      if (clustering.size() % 10 == 0) {
+        System.out.printf("INFO: Clustering progress: %.2f%%\n",
+            (best.lowBound / stopCondition * 100.0));
+      }
+      // Update cluster.nearest queues
+      for (Dendrogram c : clustering) {
+        if (c == newClus) {
+          continue;
+        }
+        queueRemoveMerged(c, best);
+        ClusterDistance newDist = getClusterDist(c, newClus, distMatrix, joinMethod);
+        c.nearest.add(newDist);
+        newClus.nearest.add(newDist);
+      }
+    }
+		
 		// If all files merged within merging threshold
 		System.out.println("INFO: Clustering finished, time: "
 		    + ((new Date().getTime()) - start.getTime()) + "ms");
@@ -139,6 +137,44 @@ public class HAC {
 				return Integer.compare(a.files.get(0).getId(), b.files.get(0).getId());
 			}
 		});
+	}
+	
+	private static ClusterDistance getClusterDist(
+	    Dendrogram a, Dendrogram b, DistanceMatrix distMatrix, int joinMethod) {
+    double d = 1.0;
+    switch (joinMethod) {
+      case METHOD_CLINK:
+        d = cLink(a, b, distMatrix);
+        break;
+      case METHOD_SLINK:
+        d = sLink(a, b, distMatrix);
+        break;
+      case METHOD_UPGMA:  // fall-through
+      default:
+        d = upgma(a, b, distMatrix);
+    }
+    return new ClusterDistance(a, b, d, d);
+	}
+	
+	private static Dendrogram mergeClusters(List<Dendrogram> clustering, ClusterDistance dist) {
+    Dendrogram a = dist.clusterA;
+    Dendrogram b = dist.clusterB;
+    Dendrogram newCluster = new Dendrogram(a, b, dist.lowBound);
+    clustering.remove(a);
+    clustering.remove(b);
+    clustering.add(newCluster);
+    return newCluster;
+	}
+	
+	private static void queueRemoveMerged(Dendrogram cluster, ClusterDistance merged) {
+    Dendrogram a = merged.clusterA;
+    Dendrogram b = merged.clusterB;
+    for (Iterator<ClusterDistance> it = cluster.nearest.iterator(); it.hasNext(); ) {
+      ClusterDistance d = it.next();
+      if (d.clusterA == a || d.clusterB == a || d.clusterA == b || d.clusterB == b) {
+        it.remove();
+      }
+    }
 	}
 	
 	/**

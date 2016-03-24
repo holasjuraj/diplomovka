@@ -3,6 +3,7 @@ package clustering;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import common.File;
 
@@ -18,6 +19,7 @@ public class Dendrogram implements Iterable<File> {
 	 * this.
 	 */
 	public List<File> files;
+	public PriorityQueue<ClusterDistance> nearest;
 	
 	/**
 	 * Initiates the {@link Dendrogram} node as leaf - with reference to a file.
@@ -28,6 +30,7 @@ public class Dendrogram implements Iterable<File> {
 		}
 		files = new ArrayList<>();
 		files.add(file);
+		nearest = new PriorityQueue<>();
 	}
 	
   /**
@@ -41,6 +44,7 @@ public class Dendrogram implements Iterable<File> {
 		files = new ArrayList<>(left.size() + right.size());
 		files.addAll(left.files);
 		files.addAll(right.files);
+    nearest = new PriorityQueue<>();
 	}
 	
   /**
