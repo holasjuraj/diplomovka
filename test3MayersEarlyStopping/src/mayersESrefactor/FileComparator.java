@@ -1,22 +1,19 @@
 package mayersESrefactor;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import mayersES.XMLTokenizer;
 
 public class FileComparator {	
-	public static final int N_THREADS = 1;
-	public static final double EARLY_STOPPING_THRESHOLD = 0.1;
+	public static final int N_THREADS = 3;
+	public static final double EARLY_STOPPING_THRESHOLD = 0.6;
 	public static final int FILES_LIMIT = 55;
 	
 	public static String[] lastFilesList = {};
@@ -42,10 +39,11 @@ public class FileComparator {
 		for(File file : (new File(inputDir)).listFiles()){
 			if(!file.isDirectory()){
 				paths.add(file.getAbsolutePath());
-				if(paths.size() >= FILES_LIMIT){
-					break;
-				}
 			}
+		}
+		Random r = new Random(12345);
+		while (paths.size() > FILES_LIMIT) {
+		  paths.remove(r.nextInt(paths.size()));
 		}
 		int filesNum = paths.size();
 		System.out.println("  count: " + filesNum + " files.");
@@ -75,7 +73,7 @@ public class FileComparator {
 //		System.out.println("threadNum\tfNum1\tfNum2\tdist\tdistL2\tpercent\tpercentL2\ttime\ttimeL2\tlength1\tlength2");
 //		System.out.println("threadNum\tfNum1\tfNum2\tdistL1\tdistL2\tpercentL1\tpercentL2\ttimeL1\ttimeL2\tlength1\tlength2");
 //		System.out.println("threadNum\tfNum1\tfNum2\tdist\tdistL1\tdistL2\tpercent\tpercentL1\tpercentL2\ttime\ttimeL1\ttimeL2\tlength1\tlength2");
-		System.out.println("threadNum\tfNum1\tfNum2\tdist\tdistL1\tdistL2\tnormDist\tnormDistL1\tnormDistL2\ttime\ttimeL1\ttimeL2\tlength1\tlength2");
+		System.out.println("threadNum\tfNum1\tfNum2\tdist\tdistL0\tdistL1\tdistL2\tnormDist\tnormDistL0\tnormDistL1\tnormDistL2\ttime\ttimeL1\ttimeL2\tlength1\tlength2");
 		final Object printKey = new Object();
 		
 		for(int t = 0; t < N_THREADS; t++){
@@ -96,6 +94,10 @@ public class FileComparator {
 							int length2 = res[2];
 							// double percent = (double)rDist / (double)(length1 + length2);
 							double normDist = normalizeDist(rDist, length1, length2);
+							double dmaxNorm =  EARLY_STOPPING_THRESHOLD;
+							double normDistL0 = Math.min(dmaxNorm, normDist);
+							int dmax = (int) Math.ceil((length1 + length2) * EARLY_STOPPING_THRESHOLD );
+							int rDistL0 = Math.min(dmax, rDist);
 							/**/
 
 							/* L1 norm */
@@ -127,11 +129,13 @@ public class FileComparator {
 							synchronized (printKey) {
 								System.out.print(tt +"\t"+ i +"\t"+ j +"\t");	// intro
 								System.out.print(rDist +"\t");				// no ES
-								System.out.print(rDistL1 +"\t");				//  L1
-								System.out.print(rDistL2 +"\t");				//   L2
-								System.out.print((normDist*100) +"\t");		// no ES
-								System.out.print((normDistL1*100) +"\t");		//  L1
-								System.out.print((normDistL2*100) +"\t");		//   L2
+                System.out.print(rDistL0 +"\t");       //  L0
+                System.out.print(rDistL1 +"\t");        //  L1
+								System.out.print(rDistL2 +"\t");				 //   L2
+								System.out.print(normDist +"\t");		// no ES
+                System.out.print(normDistL0 +"\t");  //  L0
+                System.out.print(normDistL1 +"\t");   //  L1
+								System.out.print(normDistL2 +"\t");		 //   L2
 								System.out.print(time +"\t");					// no ES
 								System.out.print(timeL1 +"\t");				//  L1
 								System.out.print(timeL2 +"\t");				//   L2
@@ -220,7 +224,7 @@ public class FileComparator {
 		// An O(ND) Difference Algorithm and Its Variations (Eugene W. Myers)
 		int n = file1.size(),
 			m = file2.size(),
-			max = (int) Math.ceil((double)(n+m) * EARLY_STOPPING_THRESHOLD);
+			max = (int) Math.ceil((double)(n + m) * EARLY_STOPPING_THRESHOLD);
 		int[] v = new int[2*max + 1];	// int[-max ... max]
 		int[] res = {max, file1.size(), file2.size()};
 		
@@ -274,7 +278,7 @@ public class FileComparator {
 		// An O(ND) Difference Algorithm and Its Variations (Eugene W. Myers)
 		int n = file1.size(),
 			m = file2.size(),
-			max = (int) Math.ceil((double)(n+m) * EARLY_STOPPING_THRESHOLD);
+			max = (int) Math.ceil((double)(n + m) * EARLY_STOPPING_THRESHOLD);
 		double diagonal = Math.sqrt(n*n + m*m);
 		int[] v = new int[2*max + 1];	// int[-max ... max]
 		int[] res = {max, file1.size(), file2.size()};
@@ -324,8 +328,9 @@ public class FileComparator {
 		
 		return res;
 	}
-	
-	public static double normalizeDist(int dist, int n, int m){
-		return 1.0 - ((double)(n+m-dist) / (double)(2*Math.max(n, m)));
-	}
+  
+  public static double normalizeDist(int dist, int n, int m){
+    return 1.0 - ((double)(n+m-dist) / (double)(2*Math.max(n, m)));
+  }
+
 }

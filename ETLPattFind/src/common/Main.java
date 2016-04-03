@@ -28,6 +28,9 @@ public class Main {
   public static final int COMPARATOR_COSINE = 2;
   public static final int COMPARATOR_JACCARD = 3;
   public static final int COMPARATOR_SORSENDICE = 4;
+
+  public static final int SCHEDULER_FULL_COMP = 0;
+  public static final int SCHEDULER_TRI_INEQ = 1;
   
   public static final int FILETYPE_SEQUENCEFILE = 0;
   public static final int FILETYPE_QGRAMFILE = 1;
@@ -47,62 +50,31 @@ public class Main {
 
   public static void dummyRun() {
     DistanceMatrix matrix = new DistanceMatrix();
-    
+    DistanceMatrix matrix2 = new DistanceMatrix();
     List<File> files = new ArrayList<>();
-    QGramFile f;
-
-    // F0
-    f = new QGramFile(0, "F0");
-    f.createProfile(Arrays.asList("a", "b"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F1
-    f = new QGramFile(1, "F1");
-    f.createProfile(Arrays.asList("a", "b"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F2
-    f = new QGramFile(2, "F2");
-    f.createProfile(Arrays.asList("a", "b"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F3
-    f = new QGramFile(3, "F3");
-    f.createProfile(Arrays.asList("a", "b"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-
-    // F4
-    f = new QGramFile(4, "F4");
-    f.createProfile(Arrays.asList("c", "d"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F5
-    f = new QGramFile(5, "F5");
-    f.createProfile(Arrays.asList("c", "d"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F6
-    f = new QGramFile(6, "F6");
-    f.createProfile(Arrays.asList("c", "d"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-    // F7
-    f = new QGramFile(7, "F7");
-    f.createProfile(Arrays.asList("c", "d"), 1);
-    files.add(f);
-    matrix.put(FileComparison.getSelfComparison(f));
-
-    String inputFilePath = "data/set1/btl_export.zip";
+//    String inputFilePath = "data/set1/btl_export.zip";
 //    String inputFilePath = "data/set2/output2.xml";
+    String inputFilePath = "data/set4/ABC.zip";
     FileComparator comparator = new UkkonenComparator();
     Parameters params = new Parameters();
     params.numberOfWorkers = 3;
-    WorkerManagerTriIneq manager = new WorkerManagerTriIneq(params.numberOfWorkers);
-    
+    WorkerManager manager = new WorkerManager(params.numberOfWorkers);
+    WorkerManagerTriIneq manager2 = new WorkerManagerTriIneq(params);
+
     files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
 
-    manager.compareFiles(files, matrix, comparator);    
+    manager.compareFiles(files, matrix, comparator);
+    manager2.compareFiles(files, matrix2, comparator);
+    
+    for (int i = 0; i < files.size(); i++) {
+      for (int j = i; j < files.size(); j++) {
+        System.out.println(i+","+j+" = "+matrix2.get(i, j));
+//        double ok = matrix.get(i, j).getDistance();
+//        double lb = matrix2.get(i, j).getLowBound();
+//        double hb = matrix2.get(i, j).getHighBound();
+//        System.out.println(((lb<=ok && ok<=hb) ? "OK, " : "ERR, ") +ok+", <"+lb+", "+hb+">");
+      }
+    }
   }
   
   public static void main(String[] args) {
@@ -111,17 +83,19 @@ public class Main {
       Date start = new Date();
       
       // DEBUG
-      dummyRun();
-      if (start.toString() != null) {
-        return;
-      }
+//      dummyRun();
+//      if (start.toString() != null) {
+//        return;
+//      }
       // /DEBUG
   
       // DEBUG
       args = new String[7];
-//      args[0] = "data/set1/btl_export.zip";
-      args[0] = "data/set2/output2.xml";
+      args[0] = "data/set1/btl_export.zip";
+//      args[0] = "data/set2/output2.xml";
+//      args[0] = "data/set2_25/output2.xml";
 //      args[0] = "data/set3/output2.zip";
+//      args[0] = "data/set4/ABC.zip";
 //      args[1] = "-s";
 //      args[2] = "data/syso.txt";
       args[3] = "-p";
@@ -172,7 +146,6 @@ public class Main {
   
       // Prepare structures
       DistanceMatrix matrix = new DistanceMatrix();
-      WorkerManager manager = new WorkerManager(params.numberOfWorkers);
       FileComparator comparator;
       switch (params.comparingMethod) {
         case COMPARATOR_EDITDISTANCE:
@@ -191,8 +164,9 @@ public class Main {
         default:
           comparator = new UkkonenComparator();
       }
-      HAC hac = new HAC(params.hacMethod);
-      
+      // TODO Make abstract WorkerManager, switch to distinguish
+//      WorkerManager manager = new WorkerManager(params.numberOfWorkers);
+      WorkerManagerTriIneq manager = new WorkerManagerTriIneq(params);
       
       // Read and prepare files
       List<File> files =
@@ -219,17 +193,18 @@ public class Main {
       // /DEBUG
   
       // Clusterize
-      List<Dendrogram> clustering = hac.clusterize(files, matrix, params.hacThreshold);
-      
+      HAC hac = new HAC(params.hacMethod, matrix, comparator);
+      List<Dendrogram> clustering = hac.clusterize(files, params.hacThreshold);
+
       // Write results
       writeResultsXml(inputFilePath, outputFilePath, clustering, params.minClusterSize);
       
       // DEBUG
-  //    System.out.println("INFO: Results:");
-  //    HAC.sortClusters(clustering);
-  //    for (Dendrogram cluster : clustering) {
-  //      System.out.println(cluster.toStringNames());
-  //    }
+//      System.out.println("INFO: Results:");
+//      HAC.sortClusters(clustering);
+//      for (Dendrogram cluster : clustering) {
+//        System.out.println(cluster.toStringIds());
+//      }
       // /DEBUG
       
       // Finalize
