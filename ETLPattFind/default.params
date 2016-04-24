@@ -14,7 +14,7 @@ threads: 4
 # 1 = Ukkonen
 # 2 = cosine
 # 3 = Jaccard
-# 4 = SorsenDice
+# 4 = SorensenDice
 # 
 # Type: integer or string
 # Default = ukkonen
@@ -26,12 +26,12 @@ comparing-method: ukkonen
 # this condition is not met. Value must be at least 0.01 (1% of the algorithm will be executed), and
 # at most 1.0 (whole algorithm will be executed).
 # Type: float
-# Default = 0.05
-editdistance-early-stopping: 0.05
+# Default = 0.1
+editdistance-early-stopping: 0.1
 
-# If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorsen-Dice), you can
-# specify the size of q-gram, i.e. how many consecutive XML tokens will be "merged" into one logical
-# unit.
+# If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorensen-Dice), you
+# can specify the size of q-gram, i.e. how many consecutive XML tokens will be "merged" into one
+# logical unit.
 # Type: integer
 # Default = 2
 qgram-size: 2

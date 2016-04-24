@@ -58,30 +58,39 @@ public class WorkerTriIneq extends Thread {
         if (manager.getDistanceMatrix().get(from, to) != null) {
           continue;
         }
-        
-        // Count approximation ...
-        FileComparison edge = new FileComparison(from, to);
-        // ... through points in A (always)
-        for (int iThrough = 0; iThrough < iFrom; iThrough++) {
-          updateBounds(from, A.get(iThrough), to, edge);
-        }
-        // ... through points in B (only if A != B)
-        if (!task.sameSet) {
-          for (int iThrough = 0; iThrough < iTo; iThrough++) {
-            updateBounds(from, B.get(iThrough), to, edge);
-          }
-        }
 
-        // Accept or reject approximation
-        if (edge.getHighBound() - edge.getLowBound() < minBoundRange) {
-          // Bounding range is so small it is considered exact -> accept
-          edge.setDistanceExact((edge.getLowBound() + edge.getHighBound()) / 2);
-        } else if (edge.getLowBound() < lbMinimum) {
-          // Lower bound is too low -> reject, compute exact
+        FileComparison edge = new FileComparison(from, to);
+        try {
+          // Count approximation ...
+          // ... through points in A (always)
+          for (int iThrough = 0; iThrough < iFrom; iThrough++) {
+            updateBounds(from, A.get(iThrough), to, edge);
+          }
+          // ... through points in B (only if A != B)
+          if (!task.sameSet) {
+            for (int iThrough = 0; iThrough < iTo; iThrough++) {
+              updateBounds(from, B.get(iThrough), to, edge);
+            }
+          }
+  
+          // Accept or reject approximation
+          if (edge.getHighBound() - edge.getLowBound() < minBoundRange) {
+            // Bounding range is so small it is considered exact -> accept
+            edge.setDistanceExact((edge.getLowBound() + edge.getHighBound()) / 2);
+          } else if (edge.getLowBound() < lbMinimum) {
+            // Lower bound is too low -> reject, compute exact
+            double dist = manager.getComparator().distance(from, to);
+            edge.setDistanceExact(dist);
+            compCount++;
+          } // else: Lower bound is good enough -> accept
+        }
+        catch (IllegalArgumentException e) {
+          // Estimate of EditDistance early stopping violated the triangular inequality -> find and
+          // set exact distance.
           double dist = manager.getComparator().distance(from, to);
           edge.setDistanceExact(dist);
           compCount++;
-        } // else: Lower bound is good enough -> accept
+        }
         
         // Save to graph
         manager.getDistanceMatrix().put(edge);
@@ -94,8 +103,8 @@ public class WorkerTriIneq extends Thread {
     setStatus(1);
   }
   
-  private void updateBounds(File from, File through, File to, FileComparison eFromTo) {
-    try {
+  private void updateBounds(File from, File through, File to, FileComparison eFromTo)
+      throws IllegalArgumentException {
     // Determine which edge is longer (in terms of their lower bounds).
     FileComparison eLong = manager.getDistanceMatrix().get(from, through);
     FileComparison eShort = manager.getDistanceMatrix().get(through, to);
@@ -109,13 +118,6 @@ public class WorkerTriIneq extends Thread {
     double hb = Math.min(eLong.getHighBound() + eShort.getHighBound(), eFromTo.getHighBound());
     // Update values
     eFromTo.setDistanceApprox(lb, hb);
-    } catch(Exception e) {
-      // DEBUG
-      System.out.println(from.getId() + " -> " + through.getId() + " -> " + to.getId());
-      System.out.println(manager.getDistanceMatrix().get(from, through));
-      System.out.println(manager.getDistanceMatrix().get(through, to));
-      throw e;
-    }
   }
   
   /**

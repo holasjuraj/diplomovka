@@ -32,7 +32,7 @@ public class Parameters {
     private static final String label_cmUkkonen = "ukkonen";
     private static final String label_cmCosine = "cosine";
     private static final String label_cmJaccard = "jaccard";
-    private static final String label_cmSorsenDice = "sorsendice";
+    private static final String label_cmSorensenDice = "sorensendice";
   private static final String label_scheduler = "scheduler";
     private static final String label_schFullComp = "full-comparison";
     private static final String label_schTriIneq = "tri-ineq";
@@ -98,7 +98,7 @@ public class Parameters {
         // Comparing method
         if (paramName.equals(label_comparingMethod)) {
           // Try interpret as number
-          Integer num = tryParseInt(paramName, paramVal, 0, Main.COMPARATOR_SORSENDICE, false);
+          Integer num = tryParseInt(paramName, paramVal, 0, Main.COMPARATOR_SORENSENDICE, false);
           if (num != null) {
             comparingMethod = num.intValue();
             continue;
@@ -112,8 +112,8 @@ public class Parameters {
             comparingMethod = Main.COMPARATOR_COSINE;
           } else if (paramVal.equals(label_cmJaccard)) {
             comparingMethod = Main.COMPARATOR_JACCARD;
-          } else if (paramVal.equals(label_cmSorsenDice)) {
-            comparingMethod = Main.COMPARATOR_SORSENDICE;
+          } else if (paramVal.equals(label_cmSorensenDice)) {
+            comparingMethod = Main.COMPARATOR_SORENSENDICE;
           } else {
             System.out.println("WARN: Parameters.Parameters: Unrecognized value of \""
                 + paramName + "\", applying default value.");

@@ -6,15 +6,15 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 
-public class Worker extends Thread {  
-  private final WorkerManager manager;
+public class WorkerNaive extends Thread {  
+  private final WorkerManagerNaive manager;
   private volatile double status;
   
   /**
    * Initialization of worker.
    * @param manager object managing my execution and tasks
    */
-  public Worker(WorkerManager manager) {
+  public WorkerNaive(WorkerManagerNaive manager) {
     this.manager = manager;
   }
 
@@ -57,7 +57,7 @@ public class Worker extends Thread {
 
 
   /**
-   * Encapsulation of {@link Worker}`s task - list of {@link FileComparison}s.
+   * Encapsulation of {@link WorkerNaive}`s task - list of {@link FileComparison}s.
    * @author Juraj
    */
   static class WorkerTask extends ArrayList<FileComparison>{

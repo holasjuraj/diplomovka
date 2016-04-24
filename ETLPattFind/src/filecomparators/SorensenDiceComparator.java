@@ -7,13 +7,13 @@ import common.Main;
 import common.QGramFile;
 
 /**
- * Implementation of Sorsen-Dice coefficient for two files.
+ * Implementation of Sorensen-Dice coefficient for two files.
  * @author Juraj
  */
-public class SorsenDiceComparator extends FileComparator {
+public class SorensenDiceComparator extends FileComparator {
 
   /**
-   * Computes distance from Sorsen-Dice coefficient of files: given two q-gram multisets A and B,
+   * Computes distance from Sorensen-Dice coefficient of files: given two q-gram multisets A and B,
    * d = 1 - 2*|A intersection B| / (|A| + |B|)
    * @return distance normalized to interval (0.0, 1.0)
    * @throws {@link IllegalArgumentException} if input files are not type {@link QGramFile}
@@ -22,7 +22,7 @@ public class SorsenDiceComparator extends FileComparator {
   @Override
   public double distance(File file1, File file2) {
     if (!(file1 instanceof QGramFile) || !(file2 instanceof QGramFile)) {
-      System.out.println("ERROR: SorsenDiceComparator.distance: Incompatable file types.");
+      System.out.println("ERROR: SorensenDiceComparator.distance: Incompatable file types.");
       throw new IllegalArgumentException();
     }
     QGramFile qFile1 = (QGramFile) file1;

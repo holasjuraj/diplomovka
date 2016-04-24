@@ -16,13 +16,9 @@ import workers.WorkerTriIneq.WorkerTask;
  * threads, prepares and delegates tasks to them.
  * @author Juraj
  */
-public class WorkerManagerTriIneq {
-  private DistanceMatrix distMatrix;
-  private FileComparator comparator;
+public class WorkerManagerTriIneq extends WorkerManager {
   private List<WorkerTask> stage1TaskPool;
   private List<WorkerTask> stage2TaskPool;
-  private List<WorkerTriIneq> workerPool;
-  final Parameters params;
   private final int numWorkers;
   private int assignedTasks;
   private int stage = 1;
@@ -32,7 +28,7 @@ public class WorkerManagerTriIneq {
    * yet launched.
    */
   public WorkerManagerTriIneq(Parameters params) {
-    this.params = params;
+    super(params);
     this.numWorkers = params.numberOfWorkers;
   }
   
@@ -42,16 +38,6 @@ public class WorkerManagerTriIneq {
       WorkerTriIneq worker = new WorkerTriIneq(this);
       workerPool.add(worker);
       worker.start();
-    }
-  }
-  
-  private void waitForWorkers() {
-    try {
-      for (WorkerTriIneq w : workerPool) {
-        w.join();
-      }
-    } catch (InterruptedException e) {
-      e.printStackTrace();
     }
   }
   
@@ -96,7 +82,6 @@ public class WorkerManagerTriIneq {
    * Provides next task from the task pool, removing it from the pool. Also prints progress.
    */
   synchronized WorkerTask serveTask() {
-    // TODO refactor!
     if (stage == 1) {
       
       if (assignedTasks < stage1TaskPool.size()) {
@@ -117,15 +102,7 @@ public class WorkerManagerTriIneq {
       
     }
   }
-  
-  DistanceMatrix getDistanceMatrix() {
-    return distMatrix;
-  }
-  
-  FileComparator getComparator() {
-    return comparator;
-  }
-  
+    
   /**
    * Creates all tasks for {@link WorkerTriIneq}s and stores it into Stage1 and Stage2 task pools.
    * @param files list of {@link File}s to be compared

@@ -42,7 +42,13 @@ public class FileComparison {
   
   public FileComparison(File f1, File f2, double lowBound, double highBound) {
     this(f1, f2);
-    setDistanceApprox(lowBound, highBound);
+    try {
+      setDistanceApprox(lowBound, highBound);
+    }
+    catch (IllegalArgumentException e) {
+      System.out.println("WARN: FileComparison.FileComparison: Low bound " + lowBound
+          + " is greater than high bound " + highBound + ".");
+    }
   }
 
 	/**
@@ -90,13 +96,14 @@ public class FileComparison {
 	/**
    * Sets the bounds of estimated distance of the {@link File}s, and marks the comparison as
    * estimate.
-   */
-	public void setDistanceApprox(double lowBound, double highBound) {
+	 * @throws IllegalArgumentException if lowBound > highBound
+	 */
+	public void setDistanceApprox(double lowBound, double highBound) throws IllegalArgumentException {
 		checkDistRange(lowBound);
 		checkDistRange(highBound);
 		if (highBound < lowBound) {
-      System.out.println("WARN: FileComparison.setDistanceApprox: Low bound " + lowBound
-          + " is greater than high bound " + highBound + ".");
+		  throw new IllegalArgumentException("Low bound " + lowBound + " is greater than high bound "
+		      + highBound + ".");
 		}
 		this.lowBound  = lowBound;
 		this.highBound = highBound;

@@ -106,7 +106,7 @@
 							<option value="ukkonen" selected>Ukkonen distance</option>
 							<option value="cosine">Cosine distance</option>
 							<option value="jaccard">Jaccard index</option>
-							<option value="sorsenDice">Sorsen-Dice coefficient</option>
+							<option value="sorensenDice">Sorensen-Dice coefficient</option>
 						</select>
 					</div>
 					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
@@ -131,8 +131,8 @@
 									of set-representation of the jobs. Fast - O(n).
 								</li>
 								<li>
-									<b>Sorsen-Dice coefficient:</b>
-									based on Sorsen-Dice coefficient
+									<b>Sorensen-Dice coefficient:</b>
+									based on Sorensen-Dice coefficient
 									of set-representation of the jobs. Fast - O(n).
 								</li>
 							</ul>
@@ -168,7 +168,7 @@
 					</div>
 					<a href="#" data-toggle="tooltip" class="tooltip-big" data-html="true" data-placement="right" title="
 						<p style='text-align:left;'>
-							If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorsen-Dice), you can
+							If you are using q-gram -based comparing of files (Ukkonen, cosine, Jaccard, Sorensen-Dice), you can
 							specify the size of q-gram, i.e. how many consecutive XML tokens will be 'merged' into one logical unit.
 						</p>
 						">

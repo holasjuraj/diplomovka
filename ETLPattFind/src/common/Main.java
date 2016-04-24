@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -17,9 +16,10 @@ import filecomparators.CosineComparator;
 import filecomparators.EditDistanceComparator;
 import filecomparators.FileComparator;
 import filecomparators.JaccardComparator;
-import filecomparators.SorsenDiceComparator;
+import filecomparators.SorensenDiceComparator;
 import filecomparators.UkkonenComparator;
 import workers.WorkerManager;
+import workers.WorkerManagerNaive;
 import workers.WorkerManagerTriIneq;
 
 public class Main {
@@ -27,7 +27,7 @@ public class Main {
   public static final int COMPARATOR_UKKONEN = 1;
   public static final int COMPARATOR_COSINE = 2;
   public static final int COMPARATOR_JACCARD = 3;
-  public static final int COMPARATOR_SORSENDICE = 4;
+  public static final int COMPARATOR_SORENSENDICE = 4;
 
   public static final int SCHEDULER_FULL_COMP = 0;
   public static final int SCHEDULER_TRI_INEQ = 1;
@@ -37,7 +37,7 @@ public class Main {
   
   /** Manual for correct command line usage. */
   public static final String USAGE =
-      "\nUsage: java -jar ETLPattFind.jar <inputfile> [-options]\n"
+      "\nUsage: java -jar ETLPattFind.jar <inputfile> [options]\n"
       + "    <inputfile> must be either .xml file, or .zip archive (not .rar or .tar.gz!)\n"
       + "                containing the .xml file. Archive cannot be locked.\n"
       + "Options include:\n"
@@ -48,60 +48,40 @@ public class Main {
       + "    -s <sysoutfile>     redirect system output to this file. Note that system\n"
       + "                        output prints only status messages, not the results.";
 
-  public static void dummyRun() {
-    DistanceMatrix matrix = new DistanceMatrix();
-    DistanceMatrix matrix2 = new DistanceMatrix();
-    List<File> files = new ArrayList<>();
+//  public static void dummyRun() {
+//    // DEBUG TOOL
+//    List<File> files = new ArrayList<>();
 //    String inputFilePath = "data/set1/btl_export.zip";
-//    String inputFilePath = "data/set2/output2.xml";
-    String inputFilePath = "data/set4/ABC.zip";
-    FileComparator comparator = new UkkonenComparator();
-    Parameters params = new Parameters();
-    params.numberOfWorkers = 3;
-    WorkerManager manager = new WorkerManager(params.numberOfWorkers);
-    WorkerManagerTriIneq manager2 = new WorkerManagerTriIneq(params);
-
-    files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
-
-    manager.compareFiles(files, matrix, comparator);
-    manager2.compareFiles(files, matrix2, comparator);
-    
-    for (int i = 0; i < files.size(); i++) {
-      for (int j = i; j < files.size(); j++) {
-        System.out.println(i+","+j+" = "+matrix2.get(i, j));
-//        double ok = matrix.get(i, j).getDistance();
-//        double lb = matrix2.get(i, j).getLowBound();
-//        double hb = matrix2.get(i, j).getHighBound();
-//        System.out.println(((lb<=ok && ok<=hb) ? "OK, " : "ERR, ") +ok+", <"+lb+", "+hb+">");
-      }
-    }
-  }
+//    FileComparator comparator = new EditDistanceComparator(1);
+//    Parameters params = new Parameters();
+//    files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
+//  }
   
   public static void main(String[] args) {
     PrintStream sysout = System.out;
     try {
       Date start = new Date();
       
-      // DEBUG
+      // DEBUG - launch dummyRun()
 //      dummyRun();
 //      if (start.toString() != null) {
 //        return;
 //      }
       // /DEBUG
   
-      // DEBUG
-      args = new String[7];
-      args[0] = "data/set1/btl_export.zip";
+      // DEBUG - substitute program arguments
+//      args = new String[7];
+////      args[0] = "data/set1/btl_export.zip";
 //      args[0] = "data/set2/output2.xml";
-//      args[0] = "data/set2_25/output2.xml";
-//      args[0] = "data/set3/output2.zip";
-//      args[0] = "data/set4/ABC.zip";
-//      args[1] = "-s";
-//      args[2] = "data/syso.txt";
-      args[3] = "-p";
-      args[4] = "test.params";
-//      args[5] = "-o";
-//      args[6] = "data/set3/testout.xml";
+////      args[0] = "data/set2_25/output2.xml";
+////      args[0] = "data/set3/output2.zip";
+////      args[0] = "data/set4/ABC.zip";
+////      args[1] = "-s";
+////      args[2] = "data/syso.txt";
+//      args[3] = "-p";
+//      args[4] = "test.params";
+////      args[5] = "-o";
+////      args[6] = "data/set3/testout.xml";
       // /DEBUG
       
       
@@ -147,6 +127,7 @@ public class Main {
       // Prepare structures
       DistanceMatrix matrix = new DistanceMatrix();
       FileComparator comparator;
+      WorkerManager manager;
       switch (params.comparingMethod) {
         case COMPARATOR_EDITDISTANCE:
           comparator = new EditDistanceComparator(params.editDistEst);
@@ -157,16 +138,25 @@ public class Main {
         case COMPARATOR_JACCARD:
           comparator = new JaccardComparator();
           break;
-        case COMPARATOR_SORSENDICE:
-          comparator = new SorsenDiceComparator();
+        case COMPARATOR_SORENSENDICE:
+          comparator = new SorensenDiceComparator();
           break;
         case COMPARATOR_UKKONEN: // fall-through
         default:
           comparator = new UkkonenComparator();
       }
-      // TODO Make abstract WorkerManager, switch to distinguish
-//      WorkerManager manager = new WorkerManager(params.numberOfWorkers);
-      WorkerManagerTriIneq manager = new WorkerManagerTriIneq(params);
+      switch (params.comparingMethod) {
+        // Choose manager according to metric properties of distance function.
+        case COMPARATOR_EDITDISTANCE: // fall-through
+        case COMPARATOR_UKKONEN: // fall-through
+        case COMPARATOR_JACCARD:
+          manager = new WorkerManagerTriIneq(params);
+          break;
+        case COMPARATOR_COSINE: // fall-through
+        case COMPARATOR_SORENSENDICE: // fall-through
+        default:
+          manager = new WorkerManagerNaive(params);
+      }
       
       // Read and prepare files
       List<File> files =
@@ -175,23 +165,6 @@ public class Main {
       // Compare all files
       manager.compareFiles(files, matrix, comparator);
       
-      // DEBUG
-  //    Scanner in = new Scanner(System.in);
-  //    double thr;
-  //    while ((thr = in.nextDouble()) > 0) {
-  //      List<Dendrogram> clustering = hac.clusterize(files, matrix, thr);
-  //      HAC.sortClusters(clustering);
-  //      System.out.println("INFO: Results for threshold " + thr + ":");
-  //      for (int i = 0; i < clustering.size(); i++) {
-  //        Dendrogram cluster = clustering.get(i);
-  //        for (File file : cluster.files) {
-  //          System.out.println(file.getName() + "\t" + (i + 1));
-  //        }
-  //      }
-  //    }
-  //    in.close();
-      // /DEBUG
-  
       // Clusterize
       HAC hac = new HAC(params.hacMethod, matrix, comparator);
       List<Dendrogram> clustering = hac.clusterize(files, params.hacThreshold);
@@ -199,7 +172,7 @@ public class Main {
       // Write results
       writeResultsXml(inputFilePath, outputFilePath, clustering, params.minClusterSize);
       
-      // DEBUG
+      // DEBUG - print results into console
 //      System.out.println("INFO: Results:");
 //      HAC.sortClusters(clustering);
 //      for (Dendrogram cluster : clustering) {
