@@ -48,42 +48,10 @@ public class Main {
       + "    -s <sysoutfile>     redirect system output to this file. Note that system\n"
       + "                        output prints only status messages, not the results.";
 
-//  public static void dummyRun() {
-//    // DEBUG TOOL
-//    List<File> files = new ArrayList<>();
-//    String inputFilePath = "data/set1/btl_export.zip";
-//    FileComparator comparator = new EditDistanceComparator(1);
-//    Parameters params = new Parameters();
-//    files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
-//  }
-  
   public static void main(String[] args) {
     PrintStream sysout = System.out;
     try {
       Date start = new Date();
-      
-      // DEBUG - launch dummyRun()
-//      dummyRun();
-//      if (start.toString() != null) {
-//        return;
-//      }
-      // /DEBUG
-  
-      // DEBUG - substitute program arguments
-//      args = new String[7];
-////      args[0] = "data/set1/btl_export.zip";
-//      args[0] = "data/set2/output2.xml";
-////      args[0] = "data/set2_25/output2.xml";
-////      args[0] = "data/set3/output2.zip";
-////      args[0] = "data/set4/ABC.zip";
-////      args[1] = "-s";
-////      args[2] = "data/syso.txt";
-//      args[3] = "-p";
-//      args[4] = "test.params";
-////      args[5] = "-o";
-////      args[6] = "data/set3/testout.xml";
-      // /DEBUG
-      
       
       // Parse arguments
       if (args.length < 1) {
@@ -176,16 +144,6 @@ public class Main {
 
       // Write results
       writeResultsXml(inputFilePath, outputFilePath, clustering, params.minClusterSize);
-      // DEBUG - testing output
-//      writeResultsTxt(inputFilePath, outputFilePath, clustering, params.minClusterSize);
-      
-      // DEBUG - print results into console
-//      System.out.println("INFO: Results:");
-//      HAC.sortClusters(clustering);
-//      for (Dendrogram cluster : clustering) {
-//        System.out.println(cluster.toStringIds());
-//      }
-      // /DEBUG
       
       // Finalize
       System.out.println("INFO: All finished, total time: "
