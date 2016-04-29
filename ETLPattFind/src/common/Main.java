@@ -145,17 +145,22 @@ public class Main {
         default:
           comparator = new UkkonenComparator();
       }
-      switch (params.comparingMethod) {
-        // Choose manager according to metric properties of distance function.
-        case COMPARATOR_EDITDISTANCE: // fall-through
-        case COMPARATOR_UKKONEN: // fall-through
-        case COMPARATOR_JACCARD:
-          manager = new WorkerManagerTriIneq(params);
-          break;
-        case COMPARATOR_COSINE: // fall-through
-        case COMPARATOR_SORENSENDICE: // fall-through
-        default:
-          manager = new WorkerManagerNaive(params);
+      if (params.scheduler == SCHEDULER_FULL_COMP) {
+        manager = new WorkerManagerNaive(params);
+      }
+      else {
+        switch (params.comparingMethod) {
+          // Choose manager according to metric properties of distance function.
+          case COMPARATOR_EDITDISTANCE: // fall-through
+          case COMPARATOR_UKKONEN: // fall-through
+          case COMPARATOR_JACCARD:
+            manager = new WorkerManagerTriIneq(params);
+            break;
+          case COMPARATOR_COSINE: // fall-through
+          case COMPARATOR_SORENSENDICE: // fall-through
+          default:
+            manager = new WorkerManagerNaive(params);
+        }
       }
       
       // Read and prepare files
@@ -171,6 +176,8 @@ public class Main {
 
       // Write results
       writeResultsXml(inputFilePath, outputFilePath, clustering, params.minClusterSize);
+      // DEBUG - testing output
+//      writeResultsTxt(inputFilePath, outputFilePath, clustering, params.minClusterSize);
       
       // DEBUG - print results into console
 //      System.out.println("INFO: Results:");
@@ -253,6 +260,27 @@ public class Main {
       }      
       
       out.println("</patterns>");                                // Close root element
+      out.close();      
+    } catch (FileNotFoundException | UnsupportedEncodingException e) {
+      System.out.println("ERROR: Main.writeResultsXml: Error writing output file.");
+      e.printStackTrace();
+    }
+  }
+  
+  public static void writeResultsTxt(
+      String inputFileName, String outputPath, List<Dendrogram> clustering, int minClusterSize) {
+    try {
+      HAC.sortClusters(clustering);
+      
+      PrintStream out = new PrintStream(
+          new FileOutputStream(outputPath), false, "UTF-8");
+      for (int i = 0; i < clustering.size(); i++) {
+        Dendrogram cluster = clustering.get(i);
+        for (File job : cluster.files) {
+          out.println(job.getName() + "\t" + i);
+        }
+      }
+      
       out.close();      
     } catch (FileNotFoundException | UnsupportedEncodingException e) {
       System.out.println("ERROR: Main.writeResultsXml: Error writing output file.");

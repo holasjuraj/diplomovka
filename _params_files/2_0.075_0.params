@@ -1,0 +1,10 @@
+threads: 3 
+comparing-method: 2 
+editdistance-early-stopping: 0.1 
+qgram-size: 2 
+scheduler: 0 
+scheduler-tri-ineq--lb-minimum: 0.075 
+scheduler-tri-ineq--min-bound-range: 0.001 
+clustering-threshold: 0.075 
+clustering-method: upgma 
+min-pattern-size: 1 
