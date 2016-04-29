@@ -3,7 +3,7 @@ package filecomparators;
 import common.File;
 
 /**
- * Interface that ensures implementation of distance() method for comparing two {@link File}s.
+ * Umbrella class that ensures implementation of distance() method for comparing two {@link File}s.
  * @author Juraj
  */
 public abstract class FileComparator {

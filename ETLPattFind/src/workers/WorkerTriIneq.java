@@ -7,6 +7,10 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 
+/**
+ * Worker for {@link WorkerManagerTriIneq}.
+ * @author Juraj
+ */
 public class WorkerTriIneq extends Thread {
   private final WorkerManagerTriIneq manager;
   private final double lbMinimum;
@@ -128,7 +132,7 @@ public class WorkerTriIneq extends Thread {
   }
   
   /**
-   * @return status of current task execution (from 0.0 to 1.0), of 1.0 if no task is being executed
+   * Set status of current task execution (from 0.0 to 1.0).
    */
   private synchronized void setStatus(double newStatus) {
     status = newStatus;
@@ -136,11 +140,13 @@ public class WorkerTriIneq extends Thread {
 
 
   /**
-   * Encapsulation of {@link Worker}`s task - list of {@link FileComparison}s.
+   * Encapsulation of {@link WorkerTriIneq}`s task. Contains one or two sets of {@link File}s. If
+   * one set is provided, then distances between files within this set are computed. If two sets are
+   * provided, we expect distances within each of them to be alreadz computed, and we compute all
+   * distances between these two sets.
    * @author Juraj
    */
-  static class WorkerTask extends ArrayList<FileComparison> {
-    private static final long serialVersionUID = -1621179815050580357L;
+  static class WorkerTask {
     private List<File> setA;
     private List<File> setB;
     private boolean sameSet;
@@ -168,15 +174,6 @@ public class WorkerTriIneq extends Thread {
       return sameSet;
     }
     
-    /**
-     * Writes all {@link FileComparison}s from task into result {@link DistanceMatrix}.
-     * @param dm result holder
-     */
-    public void submitResult(DistanceMatrix dm) {
-      for (FileComparison fc : this) {
-        dm.put(fc);
-      }
-    }
   }
   
 }

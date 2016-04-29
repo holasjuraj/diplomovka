@@ -12,6 +12,7 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 import filecomparators.FileComparator;
+import sun.awt.image.ImageWatched.Link;
 
 /**
  * Hierarchical Agglomerative Clustering - tools for splitting list of files into clusters of
@@ -28,14 +29,14 @@ public class HAC {
 	private final int joinMethod;
 	
 	/**
-	 * Initialize {@link HAC} with default joining method - UPGMA.
+	 * Initialize {@link HAC} with default joining method - UPGMA, and selected comparator.
 	 */
 	public HAC(DistanceMatrix distMatrix, FileComparator comparator) {
 		this(METHOD_UPGMA, distMatrix, comparator);
 	}
 	
 	/**
-	 * Initialize {@link HAC} with selected joining method.
+	 * Initialize {@link HAC} with selected joining method and comparator.
 	 */
 	public HAC(int joinMethod, DistanceMatrix distMatrix, FileComparator comparator) {
 		this.joinMethod = joinMethod;
@@ -93,7 +94,6 @@ public class HAC {
       }
       
       // Merge closest clusters
-//      System.out.println("MERGING "+closest);
       Dendrogram newClus = mergeClusters(clustering, closest);
       if (clustering.size() % 10 == 0) {
         System.out.printf("INFO: Clustering progress: %.2f%%\n",
@@ -121,6 +121,9 @@ public class HAC {
 	}
 
 	//// SUPPORT METHODS FOR CLUSTERING ////
+	/**
+	 * Compute distance of two clusters using preset joining method.
+	 */
 	private ClusterDistance getClusterDist(Dendrogram a, Dendrogram b) {
     switch (joinMethod) {
       case METHOD_CLINK:
@@ -133,6 +136,16 @@ public class HAC {
     }
 	}
 	
+	/**
+   * Finds pair of closest clusters within clustering. There is a chance that the "closest pair" is
+   * ambiguous, i.e. there is pair (A,B) with distance <0.1,0.25> and pair (C,D) with distance
+   * <0.2,0.3> - these intervals overlap. If this overlap occurs, function computes exact distance
+   * between (A,B) and tries again.
+   * @param clustering list of clusters
+   * @param stopCondition stopping condition for HAC
+   * @return {@link ClusterDistance} object with pair of closest clusters and their distance, or
+   *         null if no such pair exists with distance within stopping condition
+   */
 	private ClusterDistance findClosestClusters(List<Dendrogram> clustering, double stopCondition) {
 	  // Find two closest pairs
 	  PriorityQueue<ClusterDistance> candidates = new PriorityQueue<>(clustering.size());
@@ -175,6 +188,12 @@ public class HAC {
     return findClosestClusters(clustering, stopCondition);
 	}
 	
+	/**
+	 * Merges two clusters from clustering. Does not update lists of nearest clusters!
+	 * @param clustering list of clusters
+	 * @param dist {@link ClusterDistance} object with pair of clusters to be merged
+	 * @return new cluster that was created by merging
+	 */
 	private Dendrogram mergeClusters(List<Dendrogram> clustering, ClusterDistance dist) {
     Dendrogram a = dist.clusterA;
     Dendrogram b = dist.clusterB;
@@ -185,6 +204,11 @@ public class HAC {
     return newCluster;
 	}
 	
+	/**
+	 * Removes two merged clusters from a "nearest" queue of another cluster
+	 * @param cluster cluster, whose "nearest" queue should be updated
+	 * @param merged {@link ClusterDistance} object with pair of merged clusters
+	 */
 	private void queueRemoveMerged(Dendrogram cluster, ClusterDistance merged) {
     Dendrogram a = merged.clusterA;
     Dendrogram b = merged.clusterB;
@@ -198,14 +222,15 @@ public class HAC {
 	
 	//// JOINING METHODS ////
 	/**
-	 * Function for comparing distance of two clusters using UPGMA method (Unweighted Pair Group
-	 * Method with Arithmetic Mean) - arithmetic average of distances of all pairs from cluster A and
-	 * cluster B.
-	 * @param a cluster A
-	 * @param b cluster B
-	 * @param dist distance matrix - must contain comparisons for all pairs of files
-	 * @return UPGMA distance of clusters
-	 */
+   * Function for comparing distance of two clusters using UPGMA method (Unweighted Pair Group
+   * Method with Arithmetic Mean) - arithmetic average of distances of all pairs from cluster A and
+   * cluster B. Computes separately high and low bound of the distance.
+   * @param a cluster A
+   * @param b cluster B
+   * @param dist distance matrix - must contain comparisons for all pairs of files
+   * @return {@link ClusterDistance} object with low and high bound of UPGMA distance of the
+   *         clusters
+   */
 	private ClusterDistance upgma(Dendrogram a, Dendrogram b){
     double lbSum = 0;
     double hbSum = 0;
@@ -221,13 +246,14 @@ public class HAC {
 	}
 	
 	/**
-	 * Function for comparing distance of two clusters using C-Link method (Complete Linkage) -
-	 * maximal distance of two points from cluster A and cluster B.
+   * Function for comparing distance of two clusters using C-Link method (Complete Linkage) -
+   * maximal distance of two points from cluster A and cluster B. Computes separately high and low
+   * bound of the distance.
    * @param a cluster A
    * @param b cluster B
    * @param dist distance matrix - must contain comparisons for all pairs of files
-   * @return C-Link distance of clusters
-	 */
+   * @return {@link ClusterDistance} object with low and high bound of C-Link distance of clusters
+   */
 	private ClusterDistance cLink(Dendrogram a, Dendrogram b){
     double lbMax = 0;
     double hbMax = 0;
@@ -242,13 +268,14 @@ public class HAC {
 	}
 	
 	/**
-   * Function for comparing distance of two clusters using S-Link method (Single Linkage) -
-   * minimal distance of two points from cluster A and cluster B.
+   * Function for comparing distance of two clusters using S-Link method (Single Linkage) - minimal
+   * distance of two points from cluster A and cluster B. Computes separately high and low bound of
+   * the distance.
    * @param a cluster A
    * @param b cluster B
    * @param dist distance matrix - must contain comparisons for all pairs of files
-   * @return S-Link distance of clusters
-	 */
+   * @return {@link ClusterDistance} object with low and high bound of S-Link distance of clusters
+   */
 	private ClusterDistance sLink(Dendrogram a, Dendrogram b){
     double lbMin = Double.MAX_VALUE;
     double hbMin = Double.MAX_VALUE;

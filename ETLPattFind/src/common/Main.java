@@ -30,7 +30,7 @@ public class Main {
   public static final int COMPARATOR_SORENSENDICE = 4;
 
   public static final int SCHEDULER_FULL_COMP = 0;
-  public static final int SCHEDULER_TRI_INEQ = 1;
+  public static final int SCHEDULER_AUTO = 1;
   
   public static final int FILETYPE_SEQUENCEFILE = 0;
   public static final int FILETYPE_QGRAMFILE = 1;
@@ -267,8 +267,14 @@ public class Main {
     }
   }
   
-  public static void writeResultsTxt(
-      String inputFileName, String outputPath, List<Dendrogram> clustering, int minClusterSize) {
+  /**
+   * Writes resulting clustering into TXT file. The file contains one line for every input ETL job
+   * with structure: "[name_of_job]\t[id_of_cluster]". Might be useful for automated processing of
+   * result (easier parsing then XML).
+   * @param outputPath path to a file that will be written
+   * @param clustering clustering to be written. It will be sorted within this method.
+   */
+  public static void writeResultsTxt(String outputPath, List<Dendrogram> clustering) {
     try {
       HAC.sortClusters(clustering);
       

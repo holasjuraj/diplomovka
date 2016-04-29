@@ -19,6 +19,9 @@ public class Dendrogram implements Iterable<File> {
 	 * this.
 	 */
 	public List<File> files;
+	/**
+	 * List of nearest other clusters. Only store those that are closer than HAC stopping condition.
+	 */
 	public PriorityQueue<ClusterDistance> nearest;
 	
 	/**
@@ -103,6 +106,10 @@ public class Dendrogram implements Iterable<File> {
 		return distance;
 	}
 	
+	/**
+	 * Iterator for list of files within this subtree.
+	 * @see java.lang.Iterable#iterator()
+	 */
 	@Override
 	public Iterator<File> iterator() {
 		return files.iterator();

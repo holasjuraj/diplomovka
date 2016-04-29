@@ -15,7 +15,7 @@ public class Parameters {
   // Common parameters with default values
   public int numberOfWorkers = 4;
   public int comparingMethod = Main.COMPARATOR_UKKONEN;
-  public int scheduler = Main.SCHEDULER_FULL_COMP;
+  public int scheduler = Main.SCHEDULER_AUTO;
   public double hacThreshold = 0.05;
   public int hacMethod = HAC.METHOD_UPGMA;
   public int minClusterSize = 2;
@@ -35,7 +35,7 @@ public class Parameters {
     private static final String label_cmSorensenDice = "sorensendice";
   private static final String label_scheduler = "scheduler";
     private static final String label_schFullComp = "full-comparison";
-    private static final String label_schTriIneq = "tri-ineq";
+    private static final String label_schAuto = "automatic";
   private static final String label_hacThreshold = "clustering-threshold";
   private static final String label_hacmethod = "clustering-method";
     private static final String label_hmUpgma = "upgma";
@@ -124,7 +124,7 @@ public class Parameters {
         // Scheduler
         if (paramName.equals(label_scheduler)) {
           // Try interpret as number
-          Integer num = tryParseInt(paramName, paramVal, 0, Main.SCHEDULER_TRI_INEQ, false);
+          Integer num = tryParseInt(paramName, paramVal, 0, Main.SCHEDULER_AUTO, false);
           if (num != null) {
             scheduler = num.intValue();
             continue;
@@ -132,8 +132,8 @@ public class Parameters {
           // Interpret as string
           if (paramVal.equals(label_schFullComp)) {
             scheduler = Main.SCHEDULER_FULL_COMP;
-          } else if (paramVal.equals(label_schTriIneq)) {
-            scheduler = Main.SCHEDULER_TRI_INEQ;
+          } else if (paramVal.equals(label_schAuto)) {
+            scheduler = Main.SCHEDULER_AUTO;
           } else {
             System.out.println("WARN: Parameters.Parameters: Unrecognized value of \""
                 + paramName + "\", applying default value.");

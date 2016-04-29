@@ -12,8 +12,8 @@ import filecomparators.FileComparator;
 import workers.WorkerTriIneq.WorkerTask;
 
 /**
- * Class for managing a set of {@link Worker}s for comparing files. Manager creates {@link Worker}
- * threads, prepares and delegates tasks to them.
+ * A {@link WorkerManager} that uses triangular inequality to compute bounds of some distances
+ * instead of exhaustively computing them all.
  * @author Juraj
  */
 public class WorkerManagerTriIneq extends WorkerManager {
@@ -24,14 +24,16 @@ public class WorkerManagerTriIneq extends WorkerManager {
   private int stage = 1;
   
   /**
-   * Creates new manager with a given number of {@link WorkerTriIneq}s. Workers are created, but not
-   * yet launched.
+   * Creates new manager.
    */
   public WorkerManagerTriIneq(Parameters params) {
     super(params);
     this.numWorkers = params.numberOfWorkers;
   }
   
+  /**
+   * Creates all {@link WorkerTriIneq}s and runs them.
+   */
   private void createAndStartWorkers() {
     workerPool = new ArrayList<>(numWorkers);
     for (int i = 0; i < numWorkers; i++) {
@@ -43,12 +45,14 @@ public class WorkerManagerTriIneq extends WorkerManager {
   
   /**
    * Compares all files by given comparator, and stores results into distMatrix. This method
-   * prepares all tasks, launches all workers and wait for them to end.
+   * prepares all tasks, launches all workers and wait for them to end. Lot of computation is spared
+   * by replacing some distances by their lower and upper bounds.
    * @param files list of files to be compared
    * @param distMatrix distance matrix that the results will be stored in. Only adding is performed,
    *          therefore matrix can be already partially filled (current values will be replaced).
    * @param comparator comparator that will be used for comparing files. Make sure that files in
    *          list are of the same type as comparator`s required file type.
+   * @see WorkerManager#compareFiles(List, DistanceMatrix, FileComparator)
    */
   public void compareFiles(
       List<File> files, DistanceMatrix distMatrix, FileComparator comparator) {

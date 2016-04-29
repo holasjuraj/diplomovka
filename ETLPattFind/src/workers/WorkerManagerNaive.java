@@ -12,8 +12,7 @@ import filecomparators.FileComparator;
 import workers.WorkerNaive.WorkerTask;
 
 /**
- * Class for managing a set of {@link WorkerNaive}s for comparing files. Manager creates {@link WorkerNaive}
- * threads, prepares and delegates tasks to them.
+ * A {@link WorkerManager} that compares every file to every other file.
  * @author Juraj
  */
 public class WorkerManagerNaive extends WorkerManager {
@@ -21,7 +20,7 @@ public class WorkerManagerNaive extends WorkerManager {
   private int assignedTasks; 
   
   /**
-   * Creates new manager with a given number of {@link WorkerNaive}s. Workers are created, but not yet
+   * Creates new manager and creates the {@link WorkerNaive}s. Workers are created, but not yet
    * launched.
    */
   public WorkerManagerNaive(Parameters params) {
@@ -40,6 +39,7 @@ public class WorkerManagerNaive extends WorkerManager {
    *          therefore matrix can be already partially filled (current values will be replaced).
    * @param comparator comparator that will be used for comparing files. Make sure that files in
    *          list are of the same type as comparator`s required file type.
+   * @see WorkerManager#compareFiles(List, DistanceMatrix, FileComparator)
    */
   public void compareFiles(
       List<File> files, DistanceMatrix distMatrix, FileComparator comparator) {

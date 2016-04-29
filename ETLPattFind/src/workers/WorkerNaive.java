@@ -6,6 +6,10 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 
+/**
+ * Worker for {@link WorkerManagerNaive}.
+ * @author Juraj
+ */
 public class WorkerNaive extends Thread {  
   private final WorkerManagerNaive manager;
   private volatile double status;

@@ -38,15 +38,17 @@ qgram-size: 2
 
 # There are many file comparison tasks, this setting tells how to schedule them. Full-comparison
 # scheduler is simple (has lower overhead), but less effective - it simply compares all files to
-# all. Tri-Ineq scheduler is more complicated (has higher overhead), but much more effective - it
-# utilizes triangular inequality and prunes most of the hard work. Value can be either name or code
+# all. Automatic mode chooses between full-comparison and Tri-Ineq scheduler according to metric
+# properties of distance function.Tri-Ineq scheduler is more complicated (has higher overhead), but
+# much more effective - it utilizes triangular inequality and prunes most of the hard work. Value
+# can be either name or code.
 # of the scheduler:
 # 0 = full-comparison
-# 1 = tri-ineq
+# 1 = automatic
 # 
 # Type: integer or string
-# Default = full-comparison
-scheduler: full-comparison
+# Default = automatic
+scheduler: automatic
 
 # If you choose Tri-Ineq scheduler, it replaces some exact file comparisons with bounded estimates,
 # i.e. "these two files are 25% - 33% different". Here you can set minimal accepted value for the

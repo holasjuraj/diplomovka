@@ -35,11 +35,19 @@ public class FileComparison {
 		}
 	}
   
+  /**
+   * Initialize the comparison with exact distance.
+   * @see FileComparison#FileComparison(File, File)
+   */
   public FileComparison(File f1, File f2, double exactDistance) {
     this(f1, f2);
     setDistanceExact(exactDistance);
   }
-  
+
+  /**
+   * Initialize the comparison with low and high bound of the distance.
+   * @see FileComparison#FileComparison(File, File)
+   */
   public FileComparison(File f1, File f2, double lowBound, double highBound) {
     this(f1, f2);
     try {
