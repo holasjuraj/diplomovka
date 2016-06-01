@@ -1,9 +1,7 @@
 package workers;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 

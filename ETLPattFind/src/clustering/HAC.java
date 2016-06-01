@@ -12,7 +12,6 @@ import common.DistanceMatrix;
 import common.File;
 import common.FileComparison;
 import filecomparators.FileComparator;
-import sun.awt.image.ImageWatched.Link;
 
 /**
  * Hierarchical Agglomerative Clustering - tools for splitting list of files into clusters of

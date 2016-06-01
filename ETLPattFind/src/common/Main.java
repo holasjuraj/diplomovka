@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,18 @@ public class Main {
 //    String inputFilePath = "data/set1/btl_export.zip";
 //    FileComparator comparator = new EditDistanceComparator(1);
 //    Parameters params = new Parameters();
+//    params.comparingMethod = COMPARATOR_EDITDISTANCE;
 //    files = EtlReader.readAndSeparate(inputFilePath, comparator.getRequiredFileType(), params);
+//
+//    System.out.println(((SequenceFile)files.get(42)).size());
+//    System.out.println(((SequenceFile)files.get(47)).size());
+//    
+//    double d = 0;
+//    Date s = new Date();
+//    d = comparator.distance(files.get(42), files.get(47));
+//    Date e = new Date();
+//    System.out.println(d);
+//    System.out.println(e.getTime() - s.getTime());
 //  }
   
   public static void main(String[] args) {
@@ -70,18 +82,18 @@ public class Main {
       // /DEBUG
   
       // DEBUG - substitute program arguments
-//      args = new String[7];
-////      args[0] = "data/set1/btl_export.zip";
+      args = new String[7];
+      args[0] = "data/set1/btl_export.zip";
 //      args[0] = "data/set2/output2.xml";
-////      args[0] = "data/set2_25/output2.xml";
-////      args[0] = "data/set3/output2.zip";
-////      args[0] = "data/set4/ABC.zip";
-////      args[1] = "-s";
-////      args[2] = "data/syso.txt";
-//      args[3] = "-p";
-//      args[4] = "test.params";
-////      args[5] = "-o";
-////      args[6] = "data/set3/testout.xml";
+//      args[0] = "data/set2_25/output2.xml";
+//      args[0] = "data/set3/output2.zip";
+//      args[0] = "data/set4/ABC.zip";
+//      args[1] = "-s";
+//      args[2] = "data/syso.txt";
+      args[3] = "-p";
+      args[4] = "test.params";
+//      args[5] = "-o";
+//      args[6] = "data/set3/testout.xml";
       // /DEBUG
       
       

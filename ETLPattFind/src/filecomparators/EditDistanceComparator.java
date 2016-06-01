@@ -60,11 +60,18 @@ public class EditDistanceComparator extends FileComparator {
   	int max = (int) Math.ceil((double)(n + m) * earlyStoppingThreshold);
 		double diagonal = Math.sqrt(n * n + m * m);
 		int[] v = new int[2 * max + 1];	// int[-max ... max]
+		int low = 1;
+		int high = -1;
 		
-		for (int d = 0; d < max + 1; d++) {
+		int L = (int)Math.round((m + n) * 0.075);
+		
+		for (int d = 0; d <= max; d++) {
 			int x = 0;
 			int y = 0;
-			for (int k = -d; k < d + 1; k += 2) {
+			int frDiag = 0; // number of furthest anti-diagonal
+			low--;
+			high++;
+			for (int k = low; k <= high; k += 2) {
 				x = 0;
 				if (k == -d || (k != d && v[max + k - 1] < v[max + k + 1])) {
 					x = v[max + k + 1];
@@ -77,11 +84,19 @@ public class EditDistanceComparator extends FileComparator {
 					y++;
 				}
 				v[max + k] = x;
+				frDiag = Math.max(frDiag, x + y);
 				if (x >= n  &&  y >= m) {
 					return normalizeDist(d, n, m);
 				}
 			}
-		}
+
+      while (2 * v[max + low] - low  <  frDiag - L) {
+        low++;
+      }
+      while (2 * v[max + high] - high  <  frDiag - L) {
+        high--;
+      }
+    }
 		
 		/* Edit distance is greater than max.
 		 * Score approximates how close did we get to success in last run (when distance==d).
